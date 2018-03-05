@@ -14,11 +14,11 @@ library(magrittr)
 library(dplyr)
 
 # load data need data files Seeds, Results, Conferences, and Coaches
-seeds <- read.csv("NCAATourneySeeds.csv")
+seeds <- read.csv("data/NCAATourneySeeds.csv")
 seeds<-subset(seeds,Season==year)
-results <- read.csv("RegularSeasonCompactResults.csv")
+results <- read.csv("data/RegularSeasonCompactResults.csv")
 results<-subset(results,Season==year)
-testData<-read.csv("NCAATourneyCompactResults.csv")
+testData<-read.csv("data/NCAATourneyCompactResults.csv")
 testData<-subset(testData,Season==year)
 ```
 
@@ -107,7 +107,7 @@ outputFrame$ID<-paste(testDataEX$Season,testDataEX$Team1,testDataEX$Team2,sep ="
 outputFrame$Pred<-NCAAPredictions
 head(outputFrame)
 
-write.csv(outputFrame,"testOutput.csv")
+write.csv(outputFrame,"Simon-testOutput.csv")
 ```
 
 
