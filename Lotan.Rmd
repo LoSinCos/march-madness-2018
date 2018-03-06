@@ -1,0 +1,39 @@
+---
+title: "Total Possessions"
+author: "Lotan Weininger"
+date: "March 5, 2018"
+output: html_document
+---
+#Set Year = 2014
+#Trying to identify total possessions/team in order to figure out possession differentials in matchups
+#Read in Datasets
+```{r}
+Events <- read.csv("Events_2014.csv", header = TRUE)
+CompactResults <- read.csv("RegularSeasonCompactResults.csv", header = TRUE)
+DetailedResults <- read.csv("RegularSeasonDetailedResults.csv", header = TRUE)
+head(Events)
+head(CompactResults)
+head(DetailedResults)
+```
+
+#Only want to deal with Detailed Results and actually compile all the data for an individual team for 2014
+```{r}
+DetailedResults2014 <- DetailedResults[DetailedResults$Season == "2014",]
+head(DetailedResults)
+```
+
+```{r}
+DetailedResults1102W <- DetailedResults2014[DetailedResults2014$WTeamID == "1102", ]
+DetailedResults1102W
+DetailedResults1102L <- DetailedResults2014[DetailedResults2014$LTeamID == "1102", ]
+DetailedResults1102L
+```
+
+#Compile stats for 1102 on Won games
+```{r}
+Detailed1102 <- DetailedResults1102W[,c(1,2,3,4,8,9,10,11,12,13,14,15,16,17,18,19,20,21)]
+Detailed1102 
+Detailed11102 <- rbind(Detailed1102, DetailedResults1102L[, c(1,2,5,6,8,22,23,24,25,26,27,28,29,30,31,32,33,34)])
+Detailed1102
+```
+
