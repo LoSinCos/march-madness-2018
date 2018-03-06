@@ -3,3 +3,45 @@ title: "Adrian March Madness"
 output: html_notebook
 ---
 
+```{r}
+tourneyResults <- read.csv("data/NCAATourneyDetailedResults.csv")
+
+seasonResults <- read.csv("data/RegularSeasonDetailedResults.csv")
+head(seasonResults)
+```
+
+
+Create testing data from tourney results
+```{r}
+#create a subset of only the 2014 results
+tourneyResults2014 <- tourneyResults[tourneyResults$Season == "2014", c(1,3,4,5)]
+
+#wrangle the data
+# columns to paste together
+cols <- c( "Season" , "WTeamID" , "LTeamID" )
+
+# create a new column `ID` with the three columns collapsed together
+tourneyResults2014$ID <- apply( tourneyResults2014[ , colNames ] , 1 , paste , collapse = "_" )
+
+# remove the unnecessary columns
+tourneyResults2014 <- tourneyResults2014[ , !( names( tourneyResults2014 ) %in% cols ) ]
+
+#fill 
+for (i in 1:NROW(tourneyResults2014)){
+  tourneyResults2014[i,1] <- 1
+}
+
+#rename column
+colnames(tourneyResults2014)[1] <- "Actual"
+
+#Reorder columns
+tourneyResults2014 <- tourneyResults2014[,c(2,1)]
+```
+
+Create our training data
+```{r}
+
+
+seasonResults2014 <- seasonResults[seasonResults$Season == "2014", c(1,3,4,5,6)]
+```
+
