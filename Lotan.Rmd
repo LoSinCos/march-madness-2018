@@ -66,6 +66,8 @@ for (i in 1:numTeams){
 
 print(seasonAverage)
 
+write.csv(seasonAverage, file = "../2014-teams-season-average.csv", row.names = FALSE)
+
 ```
 
 
