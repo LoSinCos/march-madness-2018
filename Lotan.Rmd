@@ -4,11 +4,11 @@ author: "Lotan Weininger"
 date: "March 5, 2018"
 output: html_document
 ---
-#Set Year = 2014
+#Set Year = 2015
 #Trying to identify total possessions/team in order to figure out possession differentials in matchups
 #Read in Datasets
 ```{r}
-#Events <- read.csv("data/Events_2014.csv", header = TRUE)
+#Events <- read.csv("data/Events_2015.csv", header = TRUE)
 CompactResults <- read.csv("data/RegularSeasonCompactResults.csv", header = TRUE)
 DetailedResults <- read.csv("data/RegularSeasonDetailedResults.csv", header = TRUE)
 
@@ -20,7 +20,7 @@ head(DetailedResults)
 
 #Only want to deal with Detailed Results and actually compile all the data for an individual team for 2014
 ```{r}
-DetailedResults2014 <- DetailedResults[DetailedResults$Season == "2014",]
+DetailedResults2016 <- DetailedResults[DetailedResults$Season == "2016",]
 head(DetailedResults)
 ```
 
@@ -28,7 +28,7 @@ Find all unique teams in the given season
 
 ```{r}
 #find list of all teams during that season
-teams <- data.frame(DetailedResults2014[unique(DetailedResults2014$WTeamID, incomparables = FALSE), 3])
+teams <- data.frame(DetailedResults2016[unique(DetailedResults2016$WTeamID, incomparables = FALSE), 3])
 
 #preview data
 head(teams)
@@ -37,7 +37,46 @@ head(teams)
 nrow(teams)
 ```
 
+#Read in Coach Data
+```{r}
+CoachData <- read.csv("data/TeamCoaches.csv", header = TRUE)
+head(CoachData)
+CoachRandomTeam <- CoachData[which(CoachData$Season == "1985" & CoachData$TeamID == "1106" & CoachData$LastDayNum == "154"), 5]
+CoachRandomTeam
+```
 
+```{r}
+detailedresultsWin <- DetailedResults2016[DetailedResults2016$WTeamID == 1234,]
+detailedresultsLOSS <- DetailedResults2016[DetailedResults2016$LTeamID == 1234,]
+detailedresultsHomeW <- detailedresultsH[detailedresultsH$WLoc == "H",]
+detailedresultsHomeL <- detailedresultsLOSS[detailedresultsLOSS$WLoc == "A",]
+HomeW <- nrow(detailedresultsHomeW)
+HomeL <- nrow(detailedresultsHomeL)
+WinPerathome <- HomeW/(HomeW+HomeL)
+WinPerathome
+
+
+detailedresultsAwayW <- detailedresultsH[detailedresultsH$WLoc == "A",]
+detailedresultsAwayL <- detailedresultsLOSS[detailedresultsLOSS$WLoc == "H",]
+AwayW <- nrow(detailedresultsAwayW)
+AwayL <- nrow(detailedresultsAwayL)
+TotalAway <- AwayW + AwayL
+WinPeratAway <- AwayW/TotalAway
+WinPeratAway
+
+
+detailedresultsNeutW <- detailedresultsH[detailedresultsH$WLoc == "N",]
+detailedresultsNeutL <- detailedresultsLOSS[detailedresultsLOSS$WLoc == "N",]
+NeutW <- nrow(detailedresultsNeutW)
+NeutL <- nrow(detailedresultsNeutL)
+TotalNeut <- NeutW +NeutL
+WinPeratNeut <- NeutW/TotalNeut
+WinPeratNeut
+
+
+WinPerNotHome <- (NeutW + AwayW) / (TotalAway + TotalNeut)
+WinPerNotHome
+```
 
 ```{r}
 
@@ -45,16 +84,66 @@ numTeams <- nrow(teams)
 
 for (i in 1:numTeams){
     
-  detailedResultsW <- DetailedResults2014[DetailedResults2014$WTeamID == teams[i,], c(1,2,3,4,8,9,10,11,12,13,14,15,16,17,18,19,20,21) ]
+  detailedResultsW <- DetailedResults2016[DetailedResults2016$WTeamID == teams[i,], c(1,2,3,4,8,9,10,11,12,13,14,15,16,17,18,19,20,21) ]
   
-  detailedResultsL <- DetailedResults2014[DetailedResults2014$LTeamID == teams[i,], c(1,2,5,6,8,22,23,24,25,26,27,28,29,30,31,32,33,34) ]
+  detailedResultsL <- DetailedResults2016[DetailedResults2016$LTeamID == teams[i,], c(1,2,5,6,8,22,23,24,25,26,27,28,29,30,31,32,33,34) ]
   
   colnames(detailedResultsW) <- c("Season", "DayNum", "TeamID", "Score", "OT", "FGM", "FGA","FGM3", "FGA3", "FTM", "FTA", "OR", "DR", "AST", "TO", "STL", "BLK", "PF")
   colnames(detailedResultsL) <- c("Season", "DayNum", "TeamID", "Score", "OT", "FGM", "FGA","FGM3", "FGA3", "FTM", "FTA", "OR", "DR", "AST", "TO", "STL", "BLK", "PF")
   
   detailedBind <- rbind(detailedResultsW, detailedResultsL)
+  detailedBind$Wins <- nrow(detailedResultsW)
+  detailedBind$Losses <- nrow(detailedResultsL)
+  detailedBind$STDV_Score <- sd(detailedBind$Score, na.rm = FALSE)
+  detailedBind$STDV_FGM <- sd(detailedBind$FGM, na.rm = FALSE)
+  detailedBind$STDV_FGA <- sd(detailedBind$FGA, na.rm = FALSE)
+  detailedBind$STDV_FGM3 <- sd(detailedBind$FGM3, na.rm = FALSE)
+  detailedBind$STDV_FGA3 <- sd(detailedBind$FGA3, na.rm = FALSE)
+  detailedBind$STDV_FTM <- sd(detailedBind$FTM, na.rm = FALSE)
+  detailedBind$STDV_FTA <- sd(detailedBind$FTA, na.rm = FALSE)
+  detailedBind$STDV_OR <- sd(detailedBind$OR, na.rm = FALSE)
+  detailedBind$STDV_DR <- sd(detailedBind$DR, na.rm = FALSE)
+  detailedBind$STDV_AST <- sd(detailedBind$AST, na.rm = FALSE)
+  detailedBind$STDV_TO <- sd(detailedBind$TO, na.rm = FALSE)
+  detailedBind$STDV_STL <- sd(detailedBind$STL, na.rm = FALSE)
+  detailedBind$STDV_BLK <- sd(detailedBind$BLK, na.rm = FALSE)
+  detailedBind$STDV_PF <- sd(detailedBind$PF, na.rm = FALSE)
   
-  SeasonAverageTemp <- colMeans(detailedBind[c(1,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18)])
+  detailedresultsWin <- DetailedResults2016[DetailedResults2016$WTeamID == teams[i,],]
+  detailedresultsLOSS <- DetailedResults2016[DetailedResults2016$LTeamID == teams[i,],]
+  detailedresultsHomeW <- detailedresultsH[detailedresultsH$WLoc == "H",]
+  detailedresultsHomeL <- detailedresultsLOSS[detailedresultsLOSS$WLoc == "A",]
+  HomeW <- nrow(detailedresultsHomeW)
+  HomeL <- nrow(detailedresultsHomeL)
+  detailedBind$WinPerathome <- HomeW/(HomeW+HomeL)
+  detailedBind$WinPerathome
+
+
+  detailedresultsAwayW <- detailedresultsH[detailedresultsH$WLoc == "A",]
+  detailedresultsAwayL <- detailedresultsLOSS[detailedresultsLOSS$WLoc == "H",]
+  AwayW <- nrow(detailedresultsAwayW)
+  AwayL <- nrow(detailedresultsAwayL)
+  TotalAway <- AwayW + AwayL
+  detailedBind$WinPeratAway <- AwayW/TotalAway
+  detailedBind$WinPeratAway
+
+
+  detailedresultsNeutW <- detailedresultsH[detailedresultsH$WLoc == "N",]
+  detailedresultsNeutL <- detailedresultsLOSS[detailedresultsLOSS$WLoc == "N",]
+  NeutW <- nrow(detailedresultsNeutW)
+  NeutL <- nrow(detailedresultsNeutL)
+  TotalNeut <- NeutW +NeutL
+  detailedBind$WinPeratNeut <- NeutW/TotalNeut
+  detailedBind$WinPeratNeut
+
+
+  detailedBind$WinPerNotHome <- (NeutW + AwayW) / (TotalAway + TotalNeut)
+  detailedBind$WinPerNotHome
+  
+
+  #Coach <- CoachData[which(CoachData$Season == detailedBind$Season & CoachData$TeamID == detailedBind$TeamID & CoachData$LastDayNum == 154), 5]
+   
+  SeasonAverageTemp <- colMeans(detailedBind[c(1,3,4,6:38)])
   
   if (i == 1){
     seasonAverage <- as.data.frame(t(SeasonAverageTemp))
@@ -63,33 +152,36 @@ for (i in 1:numTeams){
   }
     
 }
-
+#print(Coach)
+#print(detailedBind$Coach)
 print(seasonAverage)
+#print(detailedBind$)
 
-write.csv(seasonAverage, file = "../2014-teams-season-average.csv", row.names = FALSE)
+write.csv(seasonAverage, file = "2016-teams-season-average.csv", row.names = FALSE)
 
 ```
 
 #### DO NOT RUN PAST THIS POINT
 
 ```{r}
-DetailedResults1102W <- DetailedResults2014[DetailedResults2014$WTeamID == "1102", c(1,2,3,4,8,9,10,11,12,13,14,15,16,17,18,19,20,21) ]
+#DetailedResults1102W <- DetailedResults2014[DetailedResults2014$WTeamID == "1102", c(1,2,3,4,8,9,10,11,12,13,14,15,16,17,18,19,20,21) ]
 #DetailedResults1102W
-DetailedResults1102L <- DetailedResults2014[DetailedResults2014$LTeamID == "1102", c(1,2,5,6,8,22,23,24,25,26,27,28,29,30,31,32,33,34) ]
+#DetailedResults1102L <- DetailedResults2014[DetailedResults2014$LTeamID == "1102", c(1,2,5,6,8,22,23,24,25,26,27,28,29,30,31,32,33,34) ]
 #DetailedResults1102L
-colnames(DetailedResults1102W) <- c("Season", "DayNum", "TeamID", "Score", "OT", "FGM", "FGA","FGM3", "FGA3", "FTM", "FTA", "OR", "DR", "AST", "TO", "STL", "BLK", "PF")
-colnames(DetailedResults1102L) <- c("Season", "DayNum", "TeamID", "Score", "OT", "FGM", "FGA","FGM3", "FGA3", "FTM", "FTA", "OR", "DR", "AST", "TO", "STL", "BLK", "PF")
+#colnames(DetailedResults1102W) <- c("Season", "DayNum", "TeamID", "Score", "OT", "FGM", "FGA","FGM3", "FGA3", "FTM", "FTA", "OR", "DR", "AST", "TO", "STL", "BLK", "PF")
+#colnames(DetailedResults1102L) <- c("Season", "DayNum", "TeamID", "Score", "OT", "FGM", "FGA","FGM3", "FGA3", "FTM", "FTA", "OR", "DR", "AST", "TO", "STL", "BLK", "PF")
 #DetailedResults1102L
 #DetailedResults1102W
-Detailed1102 <- rbind(DetailedResults1102L, DetailedResults1102W)
-Detailed1102
+#Detailed1102 <- rbind(DetailedResults1102L, DetailedResults1102W)
+#Detailed1102
 ```
 
 #Get the averages of every column
 ```{r}
-SeasonAverage <- colMeans(Detailed1102[c(1,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18)])
-SeasonAverage <- as.data.frame(t(SeasonAverage))
-SeasonAverage
+#SeasonAverage <- colMeans(Detailed1102[c(1,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18)])
+#SeasonAverage <- as.data.frame(t(SeasonAverage))
+#SeasonAverage
 ```
+
 
 
