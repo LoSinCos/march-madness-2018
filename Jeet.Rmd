@@ -80,6 +80,42 @@ training$team2_Seed <- ifelse(is.na(training$team2_Seed), 20, training$team2_See
 summary(training)
 ```
 
+Load Coach names and format accordingly
+```{r}
+coaches <- read.csv("../data/TeamCoaches.csv")
+coaches <- subset(coaches, LastDayNum==154)
+coaches <- coaches[c("Season", "TeamID", "CoachName")]
+coaches$CoachName <- lapply(coaches$CoachName, as.character)
+coaches1 <- coaches
+names(coaches1) <- c("Season", "team1_id", "team1_Coach")
+coaches2 <- coaches
+names(coaches2) <- c("Season", "team2_id", "team2_Coach")
+```
+
+
+```{r}
+# Left outer joins to associate coach data
+training <- merge(x = training, y = coaches1, by = c("Season", "team1_id"), all.x = TRUE)
+training <- merge(x = training, y = coaches2, by = c("Season", "team2_id"), all.x = TRUE)
+```
+
+
+Load Conference Data and format accordingly
+```{r}
+conference <- read.csv("../data/TeamConferences.csv")
+conference$ConfAbbrev <- lapply(conference$ConfAbbrev, as.character)
+conference1 <- conference
+names(conference1) <- c("Season", "team1_id", "team1_conference")
+conference2 <- conference
+names(conference2) <- c("Season", "team2_id", "team2_conference")
+```
+
+```{r}
+# Left outer joins to associate coach data
+training <- merge(x = training, y = conference1, by = c("Season", "team1_id"), all.x = TRUE)
+training <- merge(x = training, y = conference2, by = c("Season", "team2_id"), all.x = TRUE)
+```
+
 Normalize the feature via Z-score
 ```{r}
 resultsEX$seed_diff = (resultsEX$seed_diff - mean(resultsEx$seed_diff))/sd(resultsEX$seed_diff)
