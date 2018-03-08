@@ -3,3 +3,266 @@ title: "Adrian March Madness"
 output: html_notebook
 ---
 
+### Model 1
+### Season Data -> Predict -> March Madness Outcomes
+
+
+```{r}
+library(dplyr)
+```
+
+
+Load both season and tournament data
+
+```{r}
+marchResults <- read.csv("data/NCAATourneyDetailedResults.csv", header = TRUE)
+head(marchResults)
+
+seasonResults <- read.csv("data/RegularSeasonDetailedResults.csv", header = TRUE)
+head(seasonResults)
+```
+Season - this is the year of the associated entry in Seasons.csv (the year in which the final tournament occurs)
+
+DayNum - this integer always ranges from 0 to 132, and tells you what day the game was played on. It represents an offset from the "DayZero" date in the "Seasons.csv" file. For example, the first game in the file was DayNum=20. Combined with the fact from the "Seasons.csv" file that day zero was 10/29/1984 that year, this means the first game was played 20 days later, or 11/18/1984. There are no teams that ever played more than one game on a given date, so you can use this fact if you need a unique key (combining Season and DayNum and WTeamID). In order to accomplish this uniqueness, we had to adjust one game's date. In March 2008, the SEC postseason tournament had to reschedule one game (Georgia-Kentucky) to a subsequent day, so Georgia had to actually play two games on the same day. In order to enforce this uniqueness, we moved the game date for the Georgia-Kentucky game back to its original scheduled date.
+
+WTeamID - this identifies the id number of the team that won the game, as listed in the "Teams.csv" file. No matter whether the game was won by the home team or visiting team, or if it was a neutral-site game, the "WTeamID" always identifies the winning team.
+WScore - this identifies the number of points scored by the winning team.
+
+LTeamID - this identifies the id number of the team that lost the game.
+
+LScore - this identifies the number of points scored by the losing team. Thus you can be confident that WScore will be greater than LScore for all games listed.
+
+NumOT - this indicates the number of overtime periods in the game, an integer 0 or higher.
+
+WLoc - this identifies the "location" of the winning team. If the winning team was the home team, this value will be "H". If the winning team was the visiting team, this value will be "A". If it was played on a neutral court, then this value will be "N". Sometimes it is unclear whether the site should be considered neutral, since it is near one team's home court, or even on their court during a tournament, but for this determination we have simply used the Kenneth Massey data in its current state, where the "@" sign is either listed with the winning team, the losing team, or neither team. If you would like to investigate this factor more closely, we invite you to explore Data Section 3, which provides the city that each game was played in, irrespective of whether it was considered to be a neutral site.
+
+WFGM - field goals made (by the winning team)
+WFGA - field goals attempted (by the winning team)
+WFGM3 - three pointers made (by the winning team)
+WFGA3 - three pointers attempted (by the winning team)
+WFTM - free throws made (by the winning team)
+WFTA - free throws attempted (by the winning team)
+WOR - offensive rebounds (pulled by the winning team)
+WDR - defensive rebounds (pulled by the winning team)
+WAst - assists (by the winning team)
+WTO - turnovers committed (by the winning team)
+WStl - steals (accomplished by the winning team)
+WBlk - blocks (accomplished by the winning team)
+WPF - personal fouls committed (by the winning team)
+
+
+
+
+
+Create training data from season results (Only 2014 as of now)
+
+```{r}
+#subset 2014 data into new df
+seasonResultsClean <- seasonResults[seasonResults$Season == "2014",]
+
+write.csv(seasonResultsClean, file = "seasonResultsCleanOG.csv", row.names = FALSE)
+
+#change the column names so that they are neutral (not indicative of winner or loser)
+names(seasonResultsClean) <- gsub(x = names(seasonResultsClean), pattern = "WTeam", replacement = "Team1")
+names(seasonResultsClean) <- gsub(x = names(seasonResultsClean), pattern = "LTeam", replacement = "Team2")
+names(seasonResultsClean) <- gsub(x = names(seasonResultsClean), pattern = "W", replacement = "Team1")
+names(seasonResultsClean) <- gsub(x = names(seasonResultsClean), pattern = "L", replacement = "Team2")
+
+### Adjust the location variable for team 1 and create a location variable for team 2
+
+#fix name
+colnames(seasonResultsClean)[7] <- "Team1Loc"
+
+#convert to character type for ease of processing
+seasonResultsClean$Team1Loc <- as.character(seasonResultsClean$Team1Loc)
+
+#create a location variable for team 2 that is the opposite of Team1Loc
+seasonResultsClean <- seasonResultsClean %>% 
+  mutate(Team2Loc = case_when(Team1Loc == "N"  ~ "N", 
+                            Team1Loc == "H" ~ "A",
+                            Team1Loc == "A" ~ "H", 
+                            TRUE ~ as.character(Team1Loc)))
+
+#factorize both columns again
+seasonResultsClean$Team1Loc <- as.factor(seasonResultsClean$Team1Loc)
+seasonResultsClean$Team2Loc <- as.factor(seasonResultsClean$Team2Loc)
+
+#create a results variable
+seasonResultsClean <- seasonResultsClean %>% 
+  mutate(Result = 1)
+
+#drop certain columns in the results final data created above (TODO: these drops were selected based on current goals for the model and can be changed)
+seasonResultsClean <- seasonResultsClean[,-c(2,7,8,35),drop=FALSE]
+
+#rearrange columns so that all team 1 and team 2 statistics are grouped together
+seasonResultsClean <- seasonResultsClean[,c(1,2,4,3,6:18,5,19:31,32)]
+
+#preview the data
+head(seasonResultsClean)
+#write.csv(seasonResultsClean, file = "seasonResultsClean.csv", row.names = FALSE)
+```
+
+```{r}
+#create a list of all teams
+teamIDList <- unique(c(unique(seasonResultsClean$Team1ID, incomparables = FALSE),unique(seasonResultsClean$Team2ID, incomparables = FALSE)))
+
+#create a vector of all columns that wish to be averaged
+averageMeTeam1 <- c(4:17)
+averageMeTeam2 <- c(18:31)
+
+#average for all columns of team 1 and team 2 stats
+
+#loop through all columns in the dataset
+for(i in 1:ncol(seasonResultsClean)){
+  
+  #loop through all teams
+  for(j in 1:NROW(teamIDList)){
+    
+      #replace column value with column average
+      if(i %in% averageMeTeam1 == TRUE){
+        
+        a <- as.data.frame(seasonResultsClean[seasonResultsClean$Team1ID == teamIDList[[j]],i])
+        b <- as.data.frame(seasonResultsClean[seasonResultsClean$Team2ID == teamIDList[[j]],i+14])
+        
+        colnames(a)[1] <- "x"
+        colnames(b)[1] <- "x"
+        
+        c <- bind_rows(a,b)
+        
+        seasonResultsClean[seasonResultsClean$Team1ID == teamIDList[[j]],i] <- colMeans(c)
+        seasonResultsClean[seasonResultsClean$Team2ID == teamIDList[[j]],i+14] <- colMeans(c)
+      
+    }
+  }
+}
+```
+
+
+
+
+```{r}
+#write csvs for testing purposes
+write.csv(seasonResultsClean, file = "seasonResultsClean.csv", row.names = FALSE)
+
+#
+```
+
+
+```{r}
+### Duplicate and reverse half of the data
+
+#duplicate data
+seasonResultsCleanReverse <- seasonResultsClean
+
+#reverse the result
+seasonResultsCleanReverse <- seasonResultsCleanReverse %>%
+     mutate(Result = replace(Result, Result == 1, 0)) %>%
+     as.data.frame()
+
+#rename Team 1 to Team 2 and vice versa
+names(seasonResultsCleanReverse) <- gsub(x = names(seasonResultsCleanReverse), pattern = "Team1", replacement = "temp1")
+names(seasonResultsCleanReverse) <- gsub(x = names(seasonResultsCleanReverse), pattern = "Team2", replacement = "temp2")
+names(seasonResultsCleanReverse) <- gsub(x = names(seasonResultsCleanReverse), pattern = "temp1", replacement = "Team2")
+names(seasonResultsCleanReverse) <- gsub(x = names(seasonResultsCleanReverse), pattern = "temp2", replacement = "Team1")
+
+#reorder columns manually (TODO: this could probably be done better)
+seasonResultsCleanReverse <- seasonResultsCleanReverse[,c(1,3,2,18:31,4:17,32)]
+head(seasonResultsCleanReverse)
+
+#bind datasets together
+seasonResultsFinal <- rbind(seasonResultsClean,seasonResultsCleanReverse)
+
+#write.csv(seasonResultsCleanReverse, file = "seasonResultsCleanReverse.csv", row.names = FALSE)
+#write.csv(seasonResultsFinal, file = "seasonResultsFinal.csv", row.names = FALSE)
+```
+
+
+Create testing data from (2014) tourney results
+
+```{r}
+#create a subset of only the 2014 results
+tourneyResults <- read.csv("data/NCAATourneyDetailedResults.csv", header = TRUE)
+tourneyResults2014 <- tourneyResults[tourneyResults$Season == "2014", c(1,3,5)]
+
+#create a vector containing the column numbers from the stats we want to pull from the training data for each team
+team1StatsVector <- c(2, 4:17)
+team2StatsVector <- c(3,18:31)
+
+#rename columns for consistency with training data
+colnames(tourneyResults2014)[2:3] <- c("Team1ID", "Team2ID")
+
+#convert to character because of some R bullshit
+seasonResultsFinal$Team1ID <- as.character(seasonResultsFinal$Team1ID)
+seasonResultsFinal$Result <- as.integer(seasonResultsFinal$Result)
+seasonResultsFinal$Team2ID <- as.character(seasonResultsFinal$Team2ID)
+tourneyResults2014$Team1ID <- as.character(tourneyResults2014$Team1ID)
+tourneyResults2014$Team2ID <- as.character(tourneyResults2014$Team2ID)
+
+
+#left join dataframes to pull all of the stats from the training data
+tourneyResults2014 <- left_join(tourneyResults2014,unique(seasonResultsFinal[,team1StatsVector]),  by = "Team1ID")
+tourneyResults2014 <- left_join(tourneyResults2014,unique(seasonResultsFinal[,team2StatsVector]),  by = "Team2ID")
+
+#create a Results column that is empty
+tourneyResults2014$Result <- NA
+
+head(tourneyResults2014)
+```
+
+Create logistic regression
+
+```{r}
+
+
+#it appears that all of the columns have values between 0 and 1, but we apply a simple code to feature scale for good practice
+for (i in 4:31){
+ seasonResultsFinal[,i] <- (seasonResultsFinal[,i] - mean(seasonResultsFinal[,i]))/sd(seasonResultsFinal[,i])
+ tourneyResults2014[,i] <- (tourneyResults2014[,i] - mean(tourneyResults2014[,i]))/sd(tourneyResults2014[,i])
+}
+# check the output
+head(tourneyResults2014)
+
+LogisticReg <- glm(Result ~ . -Season -Team1ID -Team2ID ,data = seasonResultsFinal, family = binomial(logit))
+```
+
+```{r}
+summary(LogisticReg)
+
+LogisticReg <- glm(Result ~ . -Season -Team1ID -Team2ID -Team1FTM -Team2FTM,data = seasonResultsFinal, family = binomial(logit))
+summary(LogisticReg)
+
+LogisticReg <- glm(Result ~ . -Season -Team1ID -Team2ID -Team1FTM -Team2FTM -Team1FGM3 -Team2FGM3 -Team1PF -Team2PF,data = seasonResultsFinal, family = binomial(logit))
+summary(LogisticReg)
+
+LogisticReg <- glm(Result ~ . -Season -Team1ID -Team2ID -Team1FTM -Team2FTM -Team1FGM3 -Team2FGM3 -Team1PF -Team2PF -Team1FGA3 -Team2FGA3,data = seasonResultsFinal, family = binomial(logit))
+summary(LogisticReg)
+```
+
+```{r}
+LogisticReg <- glm(Result ~ . -Season -Team1ID -Team2ID -Team1FTM -Team2FTM -Team1FGM3 -Team2FGM3 -Team1PF -Team2PF -Team1FGA3 -Team2FGA3 -Team1FGM -Team2FGM,data = seasonResultsFinal, family = binomial(logit))
+summary(LogisticReg)
+```
+
+```{r}
+
+testingSet <- tourneyResults2014
+
+predictions <-predict(LogisticReg, testingSet, type = "response")
+predictions
+
+predictedLabels <- round(predictions)
+predictedLabels
+```
+
+
+```{r}
+# Get the number of data points in the test set
+sizeTestSet = dim(testingSet)[1]
+# Get the number of data points that are misclassified
+error = sum(predictedLabels != 1)
+# Calculate the misclassification rate
+misclassification_rate = error/sizeTestSet
+# Display the misclassification rate
+print(misclassification_rate)
+```
+
