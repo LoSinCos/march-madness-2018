@@ -49,7 +49,7 @@ for (i in 1:NROW(seasonResultsCompiledUnique)){
 
 ```{r}
 #write to file
-write.csv(seasonResultsCompiledUnique, file = "compiled-features/allteams-allseason-averages.csv")
+write.csv(seasonResultsCompiledUnique, file = "compiled-features/allteams-allseason-averages.csv", row.names = FALSE)
 ```
 
 
