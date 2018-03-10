@@ -14,10 +14,10 @@ year<-2014
 Pull seed data and tourney results
 ```{r}
 # load data need data files Seeds, Results, Conferences, and Coaches
-seeds <- read.csv("../data/NCAATourneySeeds.csv")
-results <- read.csv("../data/RegularSeasonCompactResults.csv")
+seeds <- read.csv("data/NCAATourneySeeds.csv")
+results <- read.csv("data/RegularSeasonCompactResults.csv")
 results<-subset(results,Season<year)
-testData<-read.csv("../data/SampleSubmissionStage1.csv")
+testData<-read.csv("data/SampleSubmissionStage1.csv")
 ```
 
 ```{r}
@@ -82,10 +82,10 @@ summary(training)
 
 Load Coach names and format accordingly
 ```{r}
-coaches <- read.csv("../data/TeamCoaches.csv")
+coaches <- read.csv("data/TeamCoaches.csv")
 coaches <- subset(coaches, LastDayNum==154)
 coaches <- coaches[c("Season", "TeamID", "CoachName")]
-coaches$CoachName <- lapply(coaches$CoachName, as.character)
+coaches$CoachName <- as.character(coaches$CoachName)
 coaches1 <- coaches
 names(coaches1) <- c("Season", "team1_id", "team1_Coach")
 coaches2 <- coaches
@@ -102,8 +102,8 @@ training <- merge(x = training, y = coaches2, by = c("Season", "team2_id"), all.
 
 Load Conference Data and format accordingly
 ```{r}
-conference <- read.csv("../data/TeamConferences.csv")
-conference$ConfAbbrev <- lapply(conference$ConfAbbrev, as.character)
+conference <- read.csv("data/TeamConferences.csv")
+conference$ConfAbbrev <- as.character(conference$ConfAbbrev)
 conference1 <- conference
 names(conference1) <- c("Season", "team1_id", "team1_conference")
 conference2 <- conference
@@ -118,19 +118,16 @@ training <- merge(x = training, y = conference2, by = c("Season", "team2_id"), a
 
 Normalize the feature via Z-score
 ```{r}
-resultsEX$seed_diff = (resultsEX$seed_diff - mean(resultsEx$seed_diff))/sd(resultsEX$seed_diff)
+training$team1_Seed = (training$team1_Seed - mean(training$team1_Seed))/sd(training$team1_Seed)
 
-resultsEX$team1_seed_str = (resultsEX$team1_seed_str - mean(resultsEx$team1_seed_str))/sd(resultsEX$team1_seed_str)
-
-resultsEX$team2_seed_str = (resultsEX$team2_seed_str - mean(resultsEx$team2_seed_str))/sd(resultsEX$team2_seed_str)
+training$team2_Seed = (training$team2_Seed - mean(training$team2_Seed))/sd(training$team2_Seed)
 ```
 
 Train NN
 ```{r}
 library(neuralnet)
-resultsEX <- na.omit(resultsEX)
-f <- as.formula('result~seed_diff+team1_seed_str+team2_seed_str')
-#nn <- neuralnet(f, data=resultsEX, hidden=c(5,3),linear.output=FALSE)
+f <- as.formula('result~team1_Seed+team2_Seed+team1_Coach+team2_Coach+team1_conference+team2_conference')
+nn <- neuralnet(f, data=training, hidden=c(5,3),linear.output=FALSE)
 ```
 
 Predict results & create submission file
