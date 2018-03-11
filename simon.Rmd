@@ -1,7 +1,7 @@
 
 Set testing year
 ```{r}
-year<-2014
+year<-1987
 ```
 
 
@@ -14,11 +14,31 @@ library(magrittr)
 library(dplyr)
 
 # load data need data files Seeds, Results, Conferences, and Coaches
-seeds <- read.csv("../data/NCAATourneySeeds.csv")
-results <- read.csv("../data/RegularSeasonCompactResults.csv")
+seeds <- read.csv("data/NCAATourneySeeds.csv")
+results <- read.csv("data/RegularSeasonCompactResults.csv")
 results<-subset(results,Season<year)
-testData<-read.csv("../data/SampleSubmissionStage1.csv")
+testData<-read.csv("data/SampleSubmissionStage1.csv")
 ```
+
+```{r}
+# seeds <- read.csv("./data/NCAATourneySeeds.csv")
+# seeds<-subset(seeds,Season<year)
+# results <- read.csv("./data/RegularSeasonCompactResults.csv")
+# results<-subset(results,Season<year)
+# 
+# for (i in 1:length(seeds$TeamID)){
+#   WinCount<-0
+#   for(j in 1:length(results$WTeamID)){
+#     if(results$WTeamID[j]==seeds$TeamID[i]&results$Season[j]==seeds$Season[i]){
+#       WinCount<-WinCount+1
+#     }
+#   }
+#   seeds$WinCount[i]<-WinCount
+# }
+# 
+# seeds
+```
+
 
 Strip seed text (!!!)
 ```{r}
@@ -105,6 +125,42 @@ head(outputFrame)
 write.csv(outputFrame,"testOutput.csv")
 ```
 
+
+
+Coach Data
+```{r}
+
+library(dplyr)
+
+CoachData<-read.csv("data/TeamCoaches.csv")
+CoachData<-subset(CoachData,LastDayNum==154)
+#CoachData
+
+CoachData %<>%
+  group_by(CoachName) %>%
+  mutate(CoachYears = 1:n())
+CoachData
+
+
+WinLossData<-read.csv("data/allteams-allseason-winloss-1985-2017.csv")
+WinLossData
+  
+library(dplyr)
+WinLossData %<>% left_join(.,select(CoachData,-c(FirstDayNum,LastDayNum)), by = c("Season", "TeamID"))
+WinLossData
+
+WinLossData$SumofWinPer <- ave(WinLossData$WinPer,WinLossData$CoachName,FUN=cumsum)
+WinLossData
+
+WinLossData$CoachWinPer<-WinLossData$SumofWinPer/WinLossData$CoachYears
+WinLossData
+
+
+```
+Write Win/Loss Data with Coach Record into CSV
+```{r}
+write.csv(WinLossData, file = "allteams-allseason-allcoaches-winloss.csv", row.names = FALSE)
+```
 
 
 

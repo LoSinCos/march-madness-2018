@@ -212,7 +212,7 @@ library(dplyr)
 seasonResults <- read.csv("../data/RegularSeasonDetailedResults.csv", header = TRUE)
 head(seasonResults)
 
-seasonResultsOrignal <- seasonResults
+seasonResultsOrignal1 <- seasonResults
 
 ```
 
@@ -227,64 +227,64 @@ names(seasonResults) <- gsub(x = names(seasonResults), pattern = "L", replacemen
 
 ```{r}
 #combine WTeam and LTeam stats
-seasonResultsCompiled <- bind_rows(seasonResults[,c(1,3)],seasonResults[,c(1,5)])
-head(seasonResultsCompiled)
+seasonResultsCompiledWins <- bind_rows(seasonResults[,c(1,3)],seasonResults[,c(1,5)])
+head(seasonResultsCompiledWins)
 #find all unique values by BOTH Season and TeamID
 #this will be the skeleton of the final database we want
-seasonResultsCompiledUnique <- distinct(seasonResultsCompiled,Season, TeamID, .keep_all = TRUE)
+seasonResultsCompiledUniqueWins <- distinct(seasonResultsCompiledWins,Season, TeamID, .keep_all = TRUE)
 ```
 
 ```{r}
 #create new columns with names
-seasonResultsCompiledUnique$Wins <- NA
-seasonResultsCompiledUnique$Loses <- NA
-seasonResultsCompiledUnique$WinsAtHome <- NA
-seasonResultsCompiledUnique$WinsAtAway <- NA
-seasonResultsCompiledUnique$WinsAtNeutral <- NA
-seasonResultsCompiledUnique$LosesAtHome <- NA
-seasonResultsCompiledUnique$LosesAtAway <- NA
-seasonResultsCompiledUnique$LosesAtNeutral <- NA
+seasonResultsCompiledUniqueWins$Wins <- NA
+seasonResultsCompiledUniqueWins$Loses <- NA
+seasonResultsCompiledUniqueWins$WinsAtHome <- NA
+seasonResultsCompiledUniqueWins$WinsAtAway <- NA
+seasonResultsCompiledUniqueWins$WinsAtNeutral <- NA
+seasonResultsCompiledUniqueWins$LosesAtHome <- NA
+seasonResultsCompiledUniqueWins$LosesAtAway <- NA
+seasonResultsCompiledUniqueWins$LosesAtNeutral <- NA
 ```
 
 
 ```{r}
 #loop through all the unique values
-for (i in 1:NROW(seasonResultsCompiledUnique)){
+for (i in 1:NROW(seasonResultsCompiledUniqueWins)){
     
     #we want to replace the per game data in each row of the unique data frame with averages for that team in that season
     #first filter the FULL season results by two variables, the current row SEASON and TEAM ID
     #then only select the rows where an average can be computed
     #compute the average of the filtered and selected 14 columns and insert those 14 rows into the respective row of the unique data frame
     
-    seasonResultsCompiledUnique[i,3] <- nrow(seasonResultsOrignal %>%
-                                               filter(Season == seasonResultsCompiledUnique[i,1], WTeamID == seasonResultsCompiledUnique[i,2]))
+    seasonResultsCompiledUniqueWins[i,3] <- nrow(seasonResultsOrignal1 %>%
+                                               filter(Season == seasonResultsCompiledUniqueWins[i,1], WTeamID == seasonResultsCompiledUniqueWins[i,2]))
     
-    seasonResultsCompiledUnique[i,4] <- nrow(seasonResultsOrignal %>%
-                                              filter(Season == seasonResultsCompiledUnique[i,1], LTeamID == seasonResultsCompiledUnique[i,2]))
+    seasonResultsCompiledUniqueWins[i,4] <- nrow(seasonResultsOrignal1 %>%
+                                              filter(Season == seasonResultsCompiledUniqueWins[i,1], LTeamID == seasonResultsCompiledUniqueWins[i,2]))
     
     #HOME
-    seasonResultsCompiledUnique[i,5] <- nrow(seasonResultsOrignal %>%
-                                               filter(Season == seasonResultsCompiledUnique[i,1], WTeamID == seasonResultsCompiledUnique[i,2], WLoc == "H"))
+    seasonResultsCompiledUniqueWins[i,5] <- nrow(seasonResultsOrignal1 %>%
+                                               filter(Season == seasonResultsCompiledUniqueWins[i,1], WTeamID == seasonResultsCompiledUniqueWins[i,2], WLoc == "H"))
     
     #Away
-    seasonResultsCompiledUnique[i,6] <- nrow(seasonResultsOrignal %>%
-                                              filter(Season == seasonResultsCompiledUnique[i,1], WTeamID == seasonResultsCompiledUnique[i,2], WLoc == "A"))
+    seasonResultsCompiledUniqueWins[i,6] <- nrow(seasonResultsOrignal1 %>%
+                                              filter(Season == seasonResultsCompiledUniqueWins[i,1], WTeamID == seasonResultsCompiledUniqueWins[i,2], WLoc == "A"))
     
     #Neutral
-    seasonResultsCompiledUnique[i,7] <- nrow(seasonResultsOrignal %>%
-                                               filter(Season == seasonResultsCompiledUnique[i,1], WTeamID == seasonResultsCompiledUnique[i,2], WLoc == "N"))
+    seasonResultsCompiledUniqueWins[i,7] <- nrow(seasonResultsOrignal1 %>%
+                                               filter(Season == seasonResultsCompiledUniqueWins[i,1], WTeamID == seasonResultsCompiledUniqueWins[i,2], WLoc == "N"))
     
      #HOME
-    seasonResultsCompiledUnique[i,8] <- nrow(seasonResultsOrignal %>%
-                                               filter(Season == seasonResultsCompiledUnique[i,1], LTeamID == seasonResultsCompiledUnique[i,2], WLoc == "H"))
+    seasonResultsCompiledUniqueWins[i,8] <- nrow(seasonResultsOrignal1 %>%
+                                               filter(Season == seasonResultsCompiledUniqueWins[i,1], LTeamID == seasonResultsCompiledUniqueWins[i,2], WLoc == "H"))
     
     #Away
-    seasonResultsCompiledUnique[i,9] <- nrow(seasonResultsOrignal %>%
-                                              filter(Season == seasonResultsCompiledUnique[i,1], LTeamID == seasonResultsCompiledUnique[i,2], WLoc == "A"))
+    seasonResultsCompiledUniqueWins[i,9] <- nrow(seasonResultsOrignal1 %>%
+                                              filter(Season == seasonResultsCompiledUniqueWins[i,1], LTeamID == seasonResultsCompiledUniqueWins[i,2], WLoc == "A"))
     
     #Neutral
-    seasonResultsCompiledUnique[i,10] <- nrow(seasonResultsOrignal %>%
-                                               filter(Season == seasonResultsCompiledUnique[i,1], LTeamID == seasonResultsCompiledUnique[i,2], WLoc == "N"))
+    seasonResultsCompiledUniqueWins[i,10] <- nrow(seasonResultsOrignal1 %>%
+                                               filter(Season == seasonResultsCompiledUniqueWins[i,1], LTeamID == seasonResultsCompiledUniqueWins[i,2], WLoc == "N"))
 }
 ```
 
@@ -294,19 +294,19 @@ for (i in 1:NROW(seasonResultsCompiledUnique)){
 ```{r}
 #seasonResultsCompiledUnique$WinPer <- NA
 
-seasonResultsCompiledUnique <- seasonResultsCompiledUnique %>%
+seasonResultsCompiledUniqueWins <- seasonResultsCompiledUniqueWins %>%
   mutate(WinPer = Wins / (Wins + Loses))
-seasonResultsCompiledUnique <- seasonResultsCompiledUnique %>%
+seasonResultsCompiledUniqueWins <- seasonResultsCompiledUniqueWins %>%
   mutate(WinPerHome = WinsAtHome / (WinsAtHome + LosesAtHome))
-seasonResultsCompiledUnique <- seasonResultsCompiledUnique %>%
+seasonResultsCompiledUniqueWins <- seasonResultsCompiledUniqueWins %>%
   mutate(WinPerAway = WinsAtAway / (WinsAtAway + LosesAtAway))
-seasonResultsCompiledUnique <- seasonResultsCompiledUnique %>%
+seasonResultsCompiledUniqueWins <- seasonResultsCompiledUniqueWins %>%
   mutate(WinPerNeut = WinsAtNeutral / (WinsAtNeutral + LosesAtNeutral))
-seasonResultsCompiledUnique <- seasonResultsCompiledUnique %>%
+seasonResultsCompiledUniqueWins <- seasonResultsCompiledUniqueWins %>%
   mutate(WinPerNotHome = (WinsAtNeutral + WinsAtAway) / ((WinsAtNeutral + LosesAtNeutral) + (WinsAtAway + LosesAtAway)))
 
 
-head(seasonResultsCompiledUnique)
+head(seasonResultsCompiledUniqueWins)
 ```
 
 ```{r}
@@ -413,25 +413,88 @@ seasonResultsCompiledUnique <- distinct(seasonResultsCompiled,Season, EventTeamI
 seasonResultsCompiled$TimeBetweenEvents <- ave(seasonResultsCompiled$ElapsedSeconds, FUN = function(x) c(0,diff(x)))
 seasonResultsCompiled
 ```
+```{r}
+seasonResultsCompiled$TimeBetweenEvents[seasonResultsCompiled$TimeBetweenEvents < 0] <- 0
+seasonResultsCompiled
+```
+```{r}
+#Create new columns
+seasonResultsCompiledUnique$TotalPossessionTime <- NA
+```
+
+```{r}
+
+```
 
 ```{r}
 #loop through all the unique values
-library(matrixStats)
+#library(matrixStats)
 for (i in 1:NROW(seasonResultsCompiledUnique)){
     
     #we want to replace the per game data in each row of the unique data frame with averages for that team in that season
     #first filter the FULL season results by two variables, the current row SEASON and TEAM ID
     #then only select the rows where an average can be computed
     #compute the average of the filtered and selected 14 columns and insert those 14 rows into the respective row of the unique data frame
-    seasonResultsCompiledUnique[i,c(3:16)] <- sapply((seasonResultsCompiled %>%
-      filter(Season == seasonResultsCompiledUnique[i,1], TeamID == seasonResultsCompiledUnique[i,2]) %>%
-      select(-(Season:TeamID))), sd)
+    seasonResultsCompiledUnique[i,c(6)] <- sum(seasonResultsCompiled %>%
+      filter(Season == seasonResultsCompiledUnique[i,1], EventTeamID == seasonResultsCompiledUnique[i,5]) %>%
+      select(-(Season:EventTeamID)), na.rm = FALSE)
 }
 ```
 
 ```{r}
+WinData <- read.csv("../data/RegularSeasonDetailedResults.csv", header = TRUE)
+head(WinData)
+```
+
+```{r}
+nrow(WinData %>%
+       filter(Season == "2010", WTeamID == "1346"))
+```
+```{r}
+seasonResultsCompiledUnique$Wins <- NA
+seasonResultsCompiledUnique$Loses <- NA
+```
+
+```{r}
+for (i in 1:NROW(seasonResultsCompiledUnique)){
+    
+    #we want to replace the per game data in each row of the unique data frame with averages for that team in that season
+    #first filter the FULL season results by two variables, the current row SEASON and TEAM ID
+    #then only select the rows where an average can be computed
+    #compute the average of the filtered and selected 14 columns and insert those 14 rows into the respective row of the unique data frame
+    seasonResultsCompiledUnique[i,c(7)] <- NROW(WinData %>%
+      filter(Season == seasonResultsCompiledUnique[i,1], WTeamID == seasonResultsCompiledUnique[i,5]))
+    
+     seasonResultsCompiledUnique[i,c(8)] <- NROW(WinData %>%
+      filter(Season == seasonResultsCompiledUnique[i,1], LTeamID == seasonResultsCompiledUnique[i,5]))
+}
+```
+
+```{r}
+seasonResultsCompiledUnique <- seasonResultsCompiledUnique %>%
+  mutate(PossessionTimePerGame = TotalPossessionTime / (Wins + Loses))
+```
+
+```{r}
+seasonResultsCompiledUnique <- seasonResultsCompiledUnique %>%
+  mutate(PossessionTimePerGameinMinutes = PossessionTimePerGame / 60)
+```
+
+```{r}
+seasonResultsCompiledUnique$WTeamID <- NULL
+seasonResultsCompiledUnique$LTeamID <- NULL
+seasonResultsCompiledUnique$ElapsedSeconds <- NULL
+seasonResultsCompiledUnique$Wins <- NULL
+seasonResultsCompiledUnique$Loses <- NULL
+```
+
+```{r}
+names(seasonResultsCompiledUnique) <- c("Season", "TeamID", "TotalPossessionTime", "PossessionTimePerGame(S)","PossessionTimePerGame(M)")
+```
+
+```{r}
 #write to file
-write.csv(seasonResultsCompiledUnique, file = "allteams-allseason-SD.csv", row.names = FALSE)
+write.csv(seasonResultsCompiledUnique, file = "allteams-allseason-AveragePossessionsperGame.csv", row.names = FALSE)
 ```
 ```
 
