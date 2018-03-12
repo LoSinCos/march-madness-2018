@@ -1,0 +1,62 @@
+
+#The answer I got is slightly off what it should be. Will work on it as soon as I have time. 
+
+```{r}
+year<-2014
+```
+
+```{r}
+
+library(stringr)
+library(tidyverse)
+library(magrittr)
+library(dplyr)
+
+
+#Load Prediction:
+FinalPredictions <- read.csv("testOutput.csv", header = TRUE)
+FinalPredictions$X <- NULL
+
+
+#Configure Real results to match format of prediction:
+
+Reality <- read.csv("data/NCAATourneyCompactResults.csv", header = TRUE)
+Reality %<>% mutate(team_id_diff = WTeamID - LTeamID, 
+                    Team1 = case_when(team_id_diff < 0 ~ WTeamID,
+                                      team_id_diff > 0 ~ LTeamID),
+                    Team2 = case_when(team_id_diff > 0 ~ WTeamID,
+                                      team_id_diff < 0 ~ LTeamID),
+                    result = if_else(WTeamID == Team1, 1, 0))
+Reality %>% filter((Team1 - Team2) > 0)
+Reality %<>% select(1,10:12)
+
+Reality<-subset(Reality,Season>=year)
+
+Reality$ID <- paste(Reality$Season,Reality$Team1,Reality$Team2, sep = "_")
+
+Reality$Season <- NULL
+Reality$Team1 <- NULL
+Reality$Team2 <- NULL
+
+```
+
+#Merge the files
+```{r}
+PredictionVSreality <- merge(FinalPredictions,Reality,by = "ID")
+head(PredictionVSreality)
+```
+
+
+#Apply Log loss function below.
+```{r}
+
+PredictionVSreality$LogLoss <- PredictionVSreality$result*log(PredictionVSreality$Pred)+(1-PredictionVSreality$result)*log(1-PredictionVSreality$Pred)
+
+GamesPlayed = dim(PredictionVSreality)[1]
+
+
+FinalLogLoss = sum(PredictionVSreality$LogLoss)*(-1/GamesPlayed)
+
+print(FinalLogLoss)
+```
+

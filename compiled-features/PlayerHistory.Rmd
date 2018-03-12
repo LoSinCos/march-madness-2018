@@ -1,0 +1,56 @@
+---
+title: "Player History"
+output: html_notebook
+---
+
+
+```{r}
+a1 <- read.csv("data/Players_2010.csv")
+a2 <- read.csv("data/Players_2011.csv")
+a3 <- read.csv("data/Players_2012.csv")
+a4 <- read.csv("data/Players_2013.csv")
+a5 <- read.csv("data/Players_2014.csv")
+a6 <- read.csv("data/Players_2015.csv")
+a7 <- read.csv("data/Players_2016.csv")
+a8 <- read.csv("data/Players_2017.csv")
+
+players <- rbind(a1, a2, a3, a4, a5, a6, a7, a8)
+players$PlayerName <- as.character(players$PlayerName)
+players <- players[players$PlayerName!="TEAM",]
+
+players <- players[with(players,order(TeamID, PlayerName, Season)),]
+players$Year <- 0
+results = dim(players)[1]
+```
+
+```{r}
+library("DescTools")
+players[1,5] <- 1
+
+for(i in 2:results){
+  if(StrDist(players[i,4], players[i-1,4], method = "levenshtein",  gap = 1, ignore.case = FALSE) > 3)
+    players[i,5] <- 1
+  else
+    players[i,5] <- players[i-1,5] + 1
+}
+```
+
+```{r}
+avg <- aggregate(players[,5],list(players$Season,players$TeamID), mean)
+stddev <- aggregate(players[,5],list(players$Season,players$TeamID), sd)
+output <- avg
+names(output) <- c("Season", "TeamID", "avg")
+output$sd <- stddev$x
+write.csv(output,"experience.csv")
+```
+
+
+Example of string distance output
+```{r}
+library("DescTools")
+
+x <- "MILOSAVLJEVIC_ALEKS"
+y <- "MILOSAVLJEVIC_ALEKS"
+
+StrDist(players[i,4], players[i-1,4], method = "levenshtein",  gap = 1, ignore.case = FALSE) < 3
+```
