@@ -1,0 +1,200 @@
+---
+title: "R Notebook"
+output: "HTML"
+---
+
+load libraries
+
+```{r}
+library(dplyr)
+library(caret)
+```
+
+load in the data sets
+
+```{r}
+winLossData <- read.csv("compiled-features/allteams-allseason-allcoaches-winloss-1985-2017.csv", header = TRUE)
+seasonAveragesData <- read.csv("compiled-features/allteams-allseason-averages.csv", header = TRUE)
+seasonSdData <- read.csv("compiled-features/allteams-allseason-SD.csv", header = TRUE)
+gamePossessionData <- read.csv("compiled-features/allteams-allseason-AveragePossessionsperGame.csv")
+```
+
+
+Create data base of features
+
+```{r}
+#prefix the column names of the averages and SD data sets
+colnames(seasonAveragesData)[c(3:16)] <- paste("Avg", colnames(seasonAveragesData[,c(3:16)]), sep = "_")
+colnames(seasonSdData)[c(3:16)] <- paste("Sd", colnames(seasonSdData[,c(3:16)]), sep = "_")
+
+#begin creating the training set with the averages data filtered to 2010:2017
+seasonData <- seasonAveragesData %>%
+  filter(Season %in% c(2010:2017))
+
+#filter the Sd data set to the same time period
+seasonSdData <- seasonSdData %>%
+  filter(Season %in% c(2010:2017))
+
+#select columns to keep from win loss data set
+winLossSelectionVector <- c(1:2,11:13,15)
+
+#subset data set to only include columns above
+winLossData <- winLossData[,winLossSelectionVector]
+
+#filter win loss data set to same time period
+winLossData <- winLossData %>%
+  filter(Season %in% c(2010:2017))
+
+#join all of the data
+seasonData <- left_join(seasonData,seasonSdData)
+seasonData <- left_join(seasonData,gamePossessionData)
+seasonData <- left_join(seasonData,winLossData)
+
+head(seasonData)
+```
+
+Create training set from season data
+
+```{r}
+seasonResults <- read.csv("data/RegularSeasonDetailedResults.csv", header = TRUE)
+head(seasonResults)
+```
+
+```{r}
+#subset 2014 data into new df
+trainingSet <- seasonResults %>%
+  filter(Season %in% c(2010:2017)) %>%
+  select(Season, WTeamID, LTeamID)
+
+#change the column names so that they are neutral (not indicative of winner or loser)
+names(trainingSet) <- gsub(x = names(trainingSet), pattern = "WTeam", replacement = "Team1")
+names(trainingSet) <- gsub(x = names(trainingSet), pattern = "LTeam", replacement = "Team2")
+names(trainingSet) <- gsub(x = names(trainingSet), pattern = "W", replacement = "Team1")
+names(trainingSet) <- gsub(x = names(trainingSet), pattern = "L", replacement = "Team2")
+
+
+
+head(trainingSet)
+
+```
+
+```{r}
+#pull data for team 1
+trainingSet <- left_join(trainingSet,seasonData, by = c("Team1ID" = "TeamID", "Season" = "Season"))
+
+# rename variables for team1
+colnames(trainingSet)[c(4:38)] <- paste("Team1", colnames(trainingSet[,c(4:38)]), sep = "_")
+
+#pull data for team 1
+trainingSet <- left_join(trainingSet,seasonData, by = c("Team2ID" = "TeamID", "Season" = "Season"))
+
+# rename variables for team1
+colnames(trainingSet)[c(39:73)] <- paste("Team2", colnames(trainingSet[,c(39:73)]), sep = "_")
+
+#create a results variable
+trainingSet <- trainingSet  %>% 
+  mutate(Result = 1)
+```
+
+
+```{r}
+#duplicate data
+trainingSetReverse <- trainingSet
+
+#reverse the result
+trainingSetReverse <- trainingSetReverse %>%
+     mutate(Result = replace(Result, Result == 1, 0)) %>%
+     as.data.frame()
+
+#rename Team 1 to Team 2 and vice versa
+names(trainingSetReverse) <- gsub(x = names(trainingSetReverse), pattern = "Team1", replacement = "temp1")
+names(trainingSetReverse) <- gsub(x = names(trainingSetReverse), pattern = "Team2", replacement = "temp2")
+names(trainingSetReverse) <- gsub(x = names(trainingSetReverse), pattern = "temp1", replacement = "Team2")
+names(trainingSetReverse) <- gsub(x = names(trainingSetReverse), pattern = "temp2", replacement = "Team1")
+
+#reorder columns manually (TODO: this could probably be done better)
+trainingSetReverse <- trainingSetReverse[,c(1,3,2,39:73,4:38,74)]
+head(trainingSetReverse)
+
+#bind datasets together
+trainingSet <- rbind(trainingSet,trainingSetReverse)
+
+trainingSet <- trainingSet[complete.cases(trainingSet),]
+
+#write.csv(trainingSet, file = "trainingSet.csv", row.names = FALSE)
+
+```
+
+
+
+```{r}
+#it appears that all of the columns have values between 0 and 1, but we apply a simple code to feature scale for good practice
+for (i in c(4:34,39:69)){
+ trainingSet[,i] <- (trainingSet[,i] - mean(trainingSet[,i]))/sd(trainingSet[,i])
+ trainingSet[,i] <- (trainingSet[,i] - mean(trainingSet[,i]))/sd(trainingSet[,i])
+}
+
+head(trainingSet)
+```
+
+```{r}
+trainingSet$Result <- as.integer(trainingSet$Result)
+summary(trainingSet$Result)
+
+numSamples <- nrow(trainingSet)
+sampleRate <- 0.1
+trainingRows <- sample(1:numSamples, sampleRate*numSamples, replace = FALSE)
+trainingSet <- trainingSet[trainingRows,]
+```
+
+
+
+```{r}
+library(e1071)
+set.seed(7)
+# prepare training scheme
+control <- trainControl(method="repeatedcv", number=2, repeats=2)
+# train the model
+model <- train(Result ~ . - Season - Team1ID - Team2ID, data= trainingSet, method="lvq", preProcess="scale", trControl=control)
+# estimate variable importance
+importance <- varImp(model, scale=FALSE)
+# summarize importance
+print(importance)
+# plot importance
+```
+
+```{r}
+library(ggplot2)
+plot(importance)
+```
+
+
+```{r}
+head(trainingSet)
+```
+
+Win Per
+Win per not Home
+Avg Score
+Total Possession Time
+AVG FGM
+AVG AST
+AVG DR
+AVG TO
+AVG FTM
+AVG BLK
+SD AST
+
+
+##Build NN
+```{r}
+library(neuralnet)
+
+nnModel <- neuralnet(Result ~ Team1_WinPer + Team2_WinPer + Team1_WinPerNotHome + Team2_WinPerNotHome + Team1_Avg_Score + Team2_Avg_Score + Team1_TotalPossessionTime + Team2_TotalPossessionTime + Team1_Avg_FGM + Team2_Avg_FGM + Team1_Avg_Ast + Team2_Avg_Ast + Team1_Avg_DR + Team2_Avg_DR, data = trainingSet, hidden = c(4), linear.output = FALSE)
+
+```
+
+```{r}
+plot(nnModel)
+```
+
