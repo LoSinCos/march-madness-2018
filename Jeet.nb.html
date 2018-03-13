@@ -176,6 +176,18 @@ $(document).ready(function () {
 <p>Set testing year</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
+<<<<<<< HEAD
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxueWVhcjwtMjAxOFxuYGBgIn0= -->
+<pre class="r"><code>year&lt;-2018</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Pull data and tourney results</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGF0YSA8LSByZWFkLmNzdihcInRyYWluaW5nU2V0LmNzdlwiKVxuYGBgIn0= -->
+<pre class="r"><code>data &lt;- read.csv(&quot;trainingSet.csv&quot;)</code></pre>
+=======
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShzdHJpbmdyKVxueWVhcjwtMjAxNFxuYGBgIn0= -->
 <pre class="r"><code>library(stringr)
 year&lt;-2014</code></pre>
@@ -191,11 +203,26 @@ seeds &lt;- read.csv(&quot;../data/NCAATourneySeeds.csv&quot;)
 results &lt;- read.csv(&quot;../data/RegularSeasonCompactResults.csv&quot;)
 results&lt;-subset(results,Season&lt;year)
 testData&lt;-read.csv(&quot;../data/SampleSubmissionStage1.csv&quot;)</code></pre>
+>>>>>>> parent of 78baa00... Added Merged CSV
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
+<<<<<<< HEAD
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGF0YSR0ZWFtMl9wb3NzZXNzaW9uX3RpbWVfcGcgPC0gTlVMTFxuZGF0YSR0ZWFtMV9wb3NzZXNzaW9uX3RpbWVfcGcgPC0gTlVMTFxuZGF0YSR0ZWFtMV9hdmdFeHAgPC0gTlVMTFxuZGF0YSR0ZWFtMl9hdmdFeHAgPC0gTlVMTFxuZGF0YSR0ZWFtMV9zZEV4cCA8LSBOVUxMXG5kYXRhJHRlYW0yX3NkRXhwIDwtIE5VTExcbmRhdGEkdGVhbTFfV2luUGVyTmV1dCA8LSBOVUxMXG5kYXRhJHRlYW0xX1dpblBlck5vdEhvbWUgPC0gTlVMTFxuZGF0YSR0ZWFtMl9XaW5QZXJOZXV0IDwtIE5VTExcbmRhdGEkdGVhbTJfV2luUGVyTm90SG9tZSA8LSBOVUxMXG5kYXRhIDwtIGRhdGFbZGF0YSRTZWFzb24gPj0gMjAwMyxdXG5gYGAifQ== -->
+<pre class="r"><code>data$team2_possession_time_pg &lt;- NULL
+data$team1_possession_time_pg &lt;- NULL
+data$team1_avgExp &lt;- NULL
+data$team2_avgExp &lt;- NULL
+data$team1_sdExp &lt;- NULL
+data$team2_sdExp &lt;- NULL
+data$team1_WinPerNeut &lt;- NULL
+data$team1_WinPerNotHome &lt;- NULL
+data$team2_WinPerNeut &lt;- NULL
+data$team2_WinPerNotHome &lt;- NULL
+data &lt;- data[data$Season &gt;= 2003,]</code></pre>
+=======
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaGVhZChzZWVkcylcbmBgYCJ9 -->
 <pre class="r"><code>head(seeds)</code></pre>
 <!-- rnb-source-end -->
@@ -219,11 +246,68 @@ testData&lt;-read.csv(&quot;../data/SampleSubmissionStage1.csv&quot;)</code></pr
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBFeHRyYWN0cyBzZWVkIG51bWJlclxuc2VlZHMkU2VlZCA8LSBhcy5pbnRlZ2VyKHN0cl9leHRyYWN0X2FsbChzZWVkcyRTZWVkLCBcIlswLTldK1wiKSlcbmBgYCJ9 -->
 <pre class="r"><code># Extracts seed number
 seeds$Seed &lt;- as.integer(str_extract_all(seeds$Seed, &quot;[0-9]+&quot;))</code></pre>
+>>>>>>> parent of 78baa00... Added Merged CSV
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
+<<<<<<< HEAD
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBTZWxlY3RpbmcgdGhlIHNjb3BlIG9mIHRoZSBkYXRhXG4jZGF0YTIwMDMgPC0gc3Vic2V0KGRhdGEsIFNlYXNvbiA8IDIwMTQpXG4jdHJhaW5pbmcyIDwtIHN1YnNldChkYXRhLCBTZWFzb24gPT0gMjAxNClcbiN0cmFpbmluZzIgPC0gc3Vic2V0KHRyYWluaW5nMiwgcG9zdCA9PSAwKVxuI2RhdGEyMDAzIDwtIHVuaW9uX2FsbChkYXRhMjAwMywgdHJhaW5pbmcyKVxuI3JtKHRyYWluaW5nMilcbmRhdGEgPC0gbmEub21pdChkYXRhKVxuYGBgIn0= -->
+<pre class="r"><code># Selecting the scope of the data
+#data2003 &lt;- subset(data, Season &lt; 2014)
+#training2 &lt;- subset(data, Season == 2014)
+#training2 &lt;- subset(training2, post == 0)
+#data2003 &lt;- union_all(data2003, training2)
+#rm(training2)
+data &lt;- na.omit(data)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>This section of code takes all the columns from teams 1 and 2, adds them together and calculates how much team1’s numbers represent as a proportion of the sum</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxueCA8LSBuYW1lcyhkYXRhKVxueDEgPC0gdW5saXN0KHN1YnNldCh4LCBncmVwbChcInRlYW0xXCIseCkpKVxueDIgPC0gdW5saXN0KHN1YnNldCh4LCBncmVwbChcInRlYW0yXCIseCkpKVxuZGF0YVNldCA8LSBkYXRhWywyOjZdXG5sZW4gPC0gbGVuZ3RoKHgxKVxuZm9yKGkgaW4gMjpsZW4pe1xuICBjb2x1bW4gPC0gc3Vic3RyKHgxW2ldLCA3LCBuY2hhcih4MVtpXSkpXG4gIGMxIDwtIHgxW2ldXG4gIGMyIDwtIHgyW2ldXG4gICNBZGRlZCBhIDAuMDAwMDAwMSBpbiB0aGUgZGVub21pbmF0b3IgdG8gcHJldmVudCBkaXZpc2lvbiBlcnJvcnNcbiAgZGF0YVNldFssY29sdW1uXSA8LSBkYXRhW2MxXS8oZGF0YVtjMV0rZGF0YVtjMl0rMC4wMDAwMDEpXG59XG5kYXRhU2V0IDwtIGRhdGFTZXRbZGF0YVNldCRwb3N0PT0xLF1cbnJtKHgsIHgxLCB4MiwgYzEsIGMyKVxuYGBgIn0= -->
+<pre class="r"><code>x &lt;- names(data)
+x1 &lt;- unlist(subset(x, grepl(&quot;team1&quot;,x)))
+x2 &lt;- unlist(subset(x, grepl(&quot;team2&quot;,x)))
+dataSet &lt;- data[,2:6]
+len &lt;- length(x1)
+for(i in 2:len){
+  column &lt;- substr(x1[i], 7, nchar(x1[i]))
+  c1 &lt;- x1[i]
+  c2 &lt;- x2[i]
+  #Added a 0.0000001 in the denominator to prevent division errors
+  dataSet[,column] &lt;- data[c1]/(data[c1]+data[c2]+0.000001)
+}
+dataSet &lt;- dataSet[dataSet$post==1,]
+rm(x, x1, x2, c1, c2)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Normalize the feature via Z-score</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29sIDwtIGRpbShkYXRhU2V0KVsyXVxubm9ybURhdGEgPC0gZGF0YVNldFxuZm9yKGkgaW4gNzpjb2wpe1xuICBub3JtRGF0YVssaV0gPSAobm9ybURhdGFbLGldIC0gbWVhbihub3JtRGF0YVssaV0pKS9zZChub3JtRGF0YVssaV0pXG59XG5gYGAifQ== -->
+<pre class="r"><code>col &lt;- dim(dataSet)[2]
+normData &lt;- dataSet
+for(i in 7:col){
+  normData[,i] = (normData[,i] - mean(normData[,i]))/sd(normData[,i])
+}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Split the data into a training and a testing set</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubnVtU2FtcGxlcyA8LSBkaW0obm9ybURhdGEpWzFdXG5zYW1wbGluZy5yYXRlID0gMC44XG50cmFpbmluZ0luZGV4IDwtIHNhbXBsZSgxOm51bVNhbXBsZXMsIG51bVNhbXBsZXMqc2FtcGxpbmcucmF0ZSwgcmVwbGFjZSA9IEZBTFNFKVxudHJhaW5pbmdTZXQgPC0gbm9ybURhdGFbdHJhaW5pbmdJbmRleCxdXG50ZXN0aW5nSW5kZXggPC0gc2V0ZGlmZigxOm51bVNhbXBsZXMsIHRyYWluaW5nSW5kZXgpXG50ZXN0aW5nU2V0IDwtIG5vcm1EYXRhW3Rlc3RpbmdJbmRleCxdXG5gYGAifQ== -->
+<pre class="r"><code>numSamples &lt;- dim(normData)[1]
+sampling.rate = 0.8
+trainingIndex &lt;- sample(1:numSamples, numSamples*sampling.rate, replace = FALSE)
+trainingSet &lt;- normData[trainingIndex,]
+testingIndex &lt;- setdiff(1:numSamples, trainingIndex)
+testingSet &lt;- normData[testingIndex,]</code></pre>
+=======
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI1Rha2luZyBvdXQgcmVzdWx0cyBiZWZvcmUgMjAxNCBmb3IgUm91bmQgMSBQcmVkaWN0aW9uICgyMDE0LTIwMTcpXG5yZXN1bHRzIDwtIHN1YnNldChyZXN1bHRzLFNlYXNvbiA8IDIwMTQpXG5oZWFkKHJlc3VsdHMpXG5gYGAifQ== -->
 <pre class="r"><code>#Taking out results before 2014 for Round 1 Prediction (2014-2017)
 results &lt;- subset(results,Season &lt; 2014)
@@ -350,12 +434,39 @@ training &lt;- merge(x = training, y = conference2, by = c(&quot;Season&quot;, &
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudHJhaW5pbmckdGVhbTFfU2VlZCA9ICh0cmFpbmluZyR0ZWFtMV9TZWVkIC0gbWVhbih0cmFpbmluZyR0ZWFtMV9TZWVkKSkvc2QodHJhaW5pbmckdGVhbTFfU2VlZClcbnRyYWluaW5nJHRlYW0yX1NlZWQgPSAodHJhaW5pbmckdGVhbTJfU2VlZCAtIG1lYW4odHJhaW5pbmckdGVhbTJfU2VlZCkpL3NkKHRyYWluaW5nJHRlYW0yX1NlZWQpXG5gYGAifQ== -->
 <pre class="r"><code>training$team1_Seed = (training$team1_Seed - mean(training$team1_Seed))/sd(training$team1_Seed)
 training$team2_Seed = (training$team2_Seed - mean(training$team2_Seed))/sd(training$team2_Seed)</code></pre>
+>>>>>>> parent of 78baa00... Added Merged CSV
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Train NN</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
+<<<<<<< HEAD
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShuZXVyYWxuZXQpXG5mIDwtIHBhc3RlKG5hbWVzKHRyYWluaW5nU2V0KVs2OmNvbF0sIGNvbGxhcHNlID0gJysnKVxuZjwtIHBhc3RlKCdyZXN1bHR+JywgZilcbiNmIDwtIGFzLmZvcm11bGEoJ3Jlc3VsdH4uLVNlYXNvbi10ZWFtMl9pZC10ZWFtMV9pZC1wb3N0Jylcbm5uIDwtIG5ldXJhbG5ldChmLCBkYXRhPXRyYWluaW5nU2V0LCBoaWRkZW49YygxOCw0KSxsaW5lYXIub3V0cHV0PUZBTFNFKVxuYGBgIn0= -->
+<pre class="r"><code>library(neuralnet)
+f &lt;- paste(names(trainingSet)[6:col], collapse = '+')
+f&lt;- paste('result~', f)
+#f &lt;- as.formula('result~.-Season-team2_id-team1_id-post')
+nn &lt;- neuralnet(f, data=trainingSet, hidden=c(18,4),linear.output=FALSE)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Predict results of Testing Set</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJlZGljdGlvbnMgPC0gY29tcHV0ZShubix0ZXN0aW5nU2V0Wyw2OjQzXSlcbnByZWRpY3Rpb25zIDwtIHByZWRpY3Rpb25zJG5ldC5yZXN1bHRcbnJvdW5kZWRQcmVkaWN0aW9ucyA8LSByb3VuZChwcmVkaWN0aW9ucylcbnNpemVUZXN0IDwtIGRpbShwcmVkaWN0aW9ucylbMV1cbmVycm9yID0gc3VtKHJvdW5kZWRQcmVkaWN0aW9ucyAhPSB0ZXN0aW5nU2V0JHJlc3VsdClcbm1pc2NsYXNzaWZpY2F0aW9uID0gZXJyb3IgLyBzaXplVGVzdFxubWlzY2xhc3NpZmljYXRpb25cbmBgYCJ9 -->
+<pre class="r"><code>predictions &lt;- compute(nn,testingSet[,6:43])
+predictions &lt;- predictions$net.result
+roundedPredictions &lt;- round(predictions)
+sizeTest &lt;- dim(predictions)[1]
+error = sum(roundedPredictions != testingSet$result)
+misclassification = error / sizeTest
+misclassification</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDAuMTA0MzI1Njk5N1xuIn0= -->
+<pre><code>[1] 0.1043256997</code></pre>
+<!-- rnb-output-end -->
+=======
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShuZXVyYWxuZXQpXG5mIDwtIGFzLmZvcm11bGEoJ3Jlc3VsdH50ZWFtMV9TZWVkK3RlYW0yX1NlZWQrdGVhbTFfQ29hY2grdGVhbTJfQ29hY2grdGVhbTFfY29uZmVyZW5jZSt0ZWFtMl9jb25mZXJlbmNlJylcbm5uIDwtIG5ldXJhbG5ldChmLCBkYXRhPXRyYWluaW5nLCBoaWRkZW49Yyg1LDMpLGxpbmVhci5vdXRwdXQ9RkFMU0UpXG5gYGAifQ== -->
 <pre class="r"><code>library(neuralnet)
 f &lt;- as.formula('result~team1_Seed+team2_Seed+team1_Coach+team2_Coach+team1_conference+team2_conference')
@@ -384,11 +495,16 @@ head(outputFrame)
 
 write.csv(outputFrame,&quot;testOutput.csv&quot;)</code></pre>
 <!-- rnb-source-end -->
+>>>>>>> parent of 78baa00... Added Merged CSV
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 
+<<<<<<< HEAD
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkplZXQgLSBFeHBlcmltZW50aW5nIg0Kb3V0cHV0OiBodG1sX25vdGVib29rDQotLS0NCg0KDQpTZXQgdGVzdGluZyB5ZWFyDQpgYGB7cn0NCnllYXI8LTIwMTgNCmBgYA0KDQoNClB1bGwgZGF0YSBhbmQgdG91cm5leSByZXN1bHRzDQpgYGB7cn0NCmRhdGEgPC0gcmVhZC5jc3YoInRyYWluaW5nU2V0LmNzdiIpDQpgYGANCg0KYGBge3J9DQpkYXRhJHRlYW0yX3Bvc3Nlc3Npb25fdGltZV9wZyA8LSBOVUxMDQpkYXRhJHRlYW0xX3Bvc3Nlc3Npb25fdGltZV9wZyA8LSBOVUxMDQpkYXRhJHRlYW0xX2F2Z0V4cCA8LSBOVUxMDQpkYXRhJHRlYW0yX2F2Z0V4cCA8LSBOVUxMDQpkYXRhJHRlYW0xX3NkRXhwIDwtIE5VTEwNCmRhdGEkdGVhbTJfc2RFeHAgPC0gTlVMTA0KZGF0YSR0ZWFtMV9XaW5QZXJOZXV0IDwtIE5VTEwNCmRhdGEkdGVhbTFfV2luUGVyTm90SG9tZSA8LSBOVUxMDQpkYXRhJHRlYW0yX1dpblBlck5ldXQgPC0gTlVMTA0KZGF0YSR0ZWFtMl9XaW5QZXJOb3RIb21lIDwtIE5VTEwNCg0KZGF0YSA8LSBkYXRhW2RhdGEkU2Vhc29uID49IDIwMDMsXQ0KYGBgDQoNCmBgYHtyfQ0KIyBTZWxlY3RpbmcgdGhlIHNjb3BlIG9mIHRoZSBkYXRhDQojZGF0YTIwMDMgPC0gc3Vic2V0KGRhdGEsIFNlYXNvbiA8IDIwMTQpDQojdHJhaW5pbmcyIDwtIHN1YnNldChkYXRhLCBTZWFzb24gPT0gMjAxNCkNCiN0cmFpbmluZzIgPC0gc3Vic2V0KHRyYWluaW5nMiwgcG9zdCA9PSAwKQ0KDQojZGF0YTIwMDMgPC0gdW5pb25fYWxsKGRhdGEyMDAzLCB0cmFpbmluZzIpDQojcm0odHJhaW5pbmcyKQ0KDQpkYXRhIDwtIG5hLm9taXQoZGF0YSkNCmBgYA0KDQpUaGlzIHNlY3Rpb24gb2YgY29kZSB0YWtlcyBhbGwgdGhlIGNvbHVtbnMgZnJvbSB0ZWFtcyAxIGFuZCAyLCBhZGRzIHRoZW0gdG9nZXRoZXIgYW5kIGNhbGN1bGF0ZXMgaG93IG11Y2ggdGVhbTEncyBudW1iZXJzIHJlcHJlc2VudCBhcyBhIHByb3BvcnRpb24gb2YgdGhlIHN1bQ0KYGBge3J9DQp4IDwtIG5hbWVzKGRhdGEpDQoNCngxIDwtIHVubGlzdChzdWJzZXQoeCwgZ3JlcGwoInRlYW0xIix4KSkpDQp4MiA8LSB1bmxpc3Qoc3Vic2V0KHgsIGdyZXBsKCJ0ZWFtMiIseCkpKQ0KDQpkYXRhU2V0IDwtIGRhdGFbLDI6Nl0NCg0KbGVuIDwtIGxlbmd0aCh4MSkNCg0KDQpmb3IoaSBpbiAyOmxlbil7DQogIGNvbHVtbiA8LSBzdWJzdHIoeDFbaV0sIDcsIG5jaGFyKHgxW2ldKSkNCiAgYzEgPC0geDFbaV0NCiAgYzIgPC0geDJbaV0NCiAgI0FkZGVkIGEgMC4wMDAwMDAxIGluIHRoZSBkZW5vbWluYXRvciB0byBwcmV2ZW50IGRpdmlzaW9uIGVycm9ycw0KICBkYXRhU2V0Wyxjb2x1bW5dIDwtIGRhdGFbYzFdLyhkYXRhW2MxXStkYXRhW2MyXSswLjAwMDAwMSkNCn0NCg0KZGF0YVNldCA8LSBkYXRhU2V0W2RhdGFTZXQkcG9zdD09MSxdDQpybSh4LCB4MSwgeDIsIGMxLCBjMikNCmBgYA0KDQoNCk5vcm1hbGl6ZSB0aGUgZmVhdHVyZSB2aWEgWi1zY29yZQ0KYGBge3J9DQpjb2wgPC0gZGltKGRhdGFTZXQpWzJdDQpub3JtRGF0YSA8LSBkYXRhU2V0DQpmb3IoaSBpbiA3OmNvbCl7DQogIG5vcm1EYXRhWyxpXSA9IChub3JtRGF0YVssaV0gLSBtZWFuKG5vcm1EYXRhWyxpXSkpL3NkKG5vcm1EYXRhWyxpXSkNCn0NCmBgYA0KDQpTcGxpdCB0aGUgZGF0YSBpbnRvIGEgdHJhaW5pbmcgYW5kIGEgdGVzdGluZyBzZXQNCmBgYHtyfQ0KbnVtU2FtcGxlcyA8LSBkaW0obm9ybURhdGEpWzFdDQpzYW1wbGluZy5yYXRlID0gMC44DQoNCnRyYWluaW5nSW5kZXggPC0gc2FtcGxlKDE6bnVtU2FtcGxlcywgbnVtU2FtcGxlcypzYW1wbGluZy5yYXRlLCByZXBsYWNlID0gRkFMU0UpDQp0cmFpbmluZ1NldCA8LSBub3JtRGF0YVt0cmFpbmluZ0luZGV4LF0NCg0KdGVzdGluZ0luZGV4IDwtIHNldGRpZmYoMTpudW1TYW1wbGVzLCB0cmFpbmluZ0luZGV4KQ0KdGVzdGluZ1NldCA8LSBub3JtRGF0YVt0ZXN0aW5nSW5kZXgsXQ0KYGBgDQoNCg0KVHJhaW4gTk4NCmBgYHtyfQ0KbGlicmFyeShuZXVyYWxuZXQpDQpmIDwtIHBhc3RlKG5hbWVzKHRyYWluaW5nU2V0KVs2OmNvbF0sIGNvbGxhcHNlID0gJysnKQ0KZjwtIHBhc3RlKCdyZXN1bHR+JywgZikNCiNmIDwtIGFzLmZvcm11bGEoJ3Jlc3VsdH4uLVNlYXNvbi10ZWFtMl9pZC10ZWFtMV9pZC1wb3N0JykNCm5uIDwtIG5ldXJhbG5ldChmLCBkYXRhPXRyYWluaW5nU2V0LCBoaWRkZW49YygxOCw0KSxsaW5lYXIub3V0cHV0PUZBTFNFKQ0KYGBgDQoNClByZWRpY3QgcmVzdWx0cyBvZiBUZXN0aW5nIFNldA0KYGBge3J9DQpwcmVkaWN0aW9ucyA8LSBjb21wdXRlKG5uLHRlc3RpbmdTZXRbLDY6NDNdKQ0KDQpwcmVkaWN0aW9ucyA8LSBwcmVkaWN0aW9ucyRuZXQucmVzdWx0DQpyb3VuZGVkUHJlZGljdGlvbnMgPC0gcm91bmQocHJlZGljdGlvbnMpDQoNCnNpemVUZXN0IDwtIGRpbShwcmVkaWN0aW9ucylbMV0NCmVycm9yID0gc3VtKHJvdW5kZWRQcmVkaWN0aW9ucyAhPSB0ZXN0aW5nU2V0JHJlc3VsdCkNCm1pc2NsYXNzaWZpY2F0aW9uID0gZXJyb3IgLyBzaXplVGVzdA0KDQptaXNjbGFzc2lmaWNhdGlvbg0KYGBgDQoNCg0K</div>
+=======
 <div id="rmd-source-code">LS0tDQp0aXRsZTogIkplZXQgLSBFeHBlcmltZW50aW5nIg0Kb3V0cHV0OiBodG1sX25vdGVib29rDQotLS0NCg0KDQpTZXQgdGVzdGluZyB5ZWFyDQpgYGB7cn0NCmxpYnJhcnkoc3RyaW5ncikNCnllYXI8LTIwMTQNCmBgYA0KDQoNClB1bGwgc2VlZCBkYXRhIGFuZCB0b3VybmV5IHJlc3VsdHMNCmBgYHtyfQ0KIyBsb2FkIGRhdGEgbmVlZCBkYXRhIGZpbGVzIFNlZWRzLCBSZXN1bHRzLCBDb25mZXJlbmNlcywgYW5kIENvYWNoZXMNCnNlZWRzIDwtIHJlYWQuY3N2KCJkYXRhL05DQUFUb3VybmV5U2VlZHMuY3N2IikNCnJlc3VsdHMgPC0gcmVhZC5jc3YoImRhdGEvUmVndWxhclNlYXNvbkNvbXBhY3RSZXN1bHRzLmNzdiIpDQpyZXN1bHRzPC1zdWJzZXQocmVzdWx0cyxTZWFzb248eWVhcikNCnRlc3REYXRhPC1yZWFkLmNzdigiZGF0YS9TYW1wbGVTdWJtaXNzaW9uU3RhZ2UxLmNzdiIpDQpgYGANCg0KYGBge3J9DQpoZWFkKHNlZWRzKQ0KaGVhZChyZXN1bHRzKQ0KDQojIEV4dHJhY3RzIHNlZWQgbnVtYmVyDQpzZWVkcyRTZWVkIDwtIGFzLmludGVnZXIoc3RyX2V4dHJhY3RfYWxsKHNlZWRzJFNlZWQsICJbMC05XSsiKSkNCmBgYA0KDQpgYGB7cn0NCiNUYWtpbmcgb3V0IHJlc3VsdHMgYmVmb3JlIDIwMTQgZm9yIFJvdW5kIDEgUHJlZGljdGlvbiAoMjAxNC0yMDE3KQ0KcmVzdWx0cyA8LSBzdWJzZXQocmVzdWx0cyxTZWFzb24gPCAyMDE0KQ0KaGVhZChyZXN1bHRzKQ0KDQpsaWJyYXJ5KGRwbHlyKQ0KDQojIENvcGllcyB0aGUgcmVzdWx0cyBpbnRvIA0KdHJhbnNmb3JtZWQxIDwtIHJlc3VsdHMNCnRyYW5zZm9ybWVkMiA8LSByZXN1bHRzDQoNCiMgQ2hhbmdlcyBmb3JtYXQgdG8gYmUgc2ltaWxhciB0byB0ZXN0IGZpbGUNCnRyYW5zZm9ybWVkMSA8LSBtdXRhdGUodHJhbnNmb3JtZWQxLA0KICB0ZWFtMV9pZCA9IFdUZWFtSUQsDQogIHRlYW0yX2lkID0gTFRlYW1JRCwNCiAgcmVzdWx0ID0gMSkNCg0KdHJhbnNmb3JtZWQyIDwtIG11dGF0ZSh0cmFuc2Zvcm1lZDIsDQogIHRlYW0xX2lkID0gTFRlYW1JRCwNCiAgdGVhbTJfaWQgPSBXVGVhbUlELA0KICByZXN1bHQgPSAwKQ0KDQojIEdldHMgb25seSByZWxldmFudCBkYXRhDQp0cmFuc2Zvcm1lZDEgPC0gdHJhbnNmb3JtZWQxW2MoIlNlYXNvbiIsInRlYW0xX2lkIiwgInRlYW0yX2lkIiwgInJlc3VsdCIpXQ0KdHJhbnNmb3JtZWQyIDwtIHRyYW5zZm9ybWVkMltjKCJTZWFzb24iLCJ0ZWFtMV9pZCIsICJ0ZWFtMl9pZCIsICJyZXN1bHQiKV0NCg0KIyBEb3VibGVzIHRoZSByb3dzIHRvIHN3aXRjaCBhcm91bmQgdGVhbTEgYW5kIHRlYW0gMiBhbmQgaW5jbHVkZSBhIGxvc3MNCnRyYWluaW5nIDwtIHVuaW9uX2FsbCh0cmFuc2Zvcm1lZDEsdHJhbnNmb3JtZWQyKQ0KYGBgDQoNCg0KYGBge3J9DQojIENvcGllcyBzZWVkcyBpbnRvIG90aGVyIGRhdGFiYXNlcyBmb3IgbWVyZ2luZw0Kc2VlZHMxIDwtIHNlZWRzDQpuYW1lcyhzZWVkczEpIDwtIGMoIlNlYXNvbiIsICJ0ZWFtMV9TZWVkIiwgInRlYW0xX2lkIikNCnNlZWRzMiA8LSBzZWVkcw0KbmFtZXMoc2VlZHMyKSA8LSBjKCJTZWFzb24iLCAidGVhbTJfU2VlZCIsICJ0ZWFtMl9pZCIpDQoNCiMgTGVmdCBvdXRlciBqb2lucyB0byBhc3NvY2lhdGUgc2VlZCBkYXRhDQp0cmFpbmluZyA8LSBtZXJnZSh4ID0gdHJhaW5pbmcsIHkgPSBzZWVkczEsIGJ5ID0gYygiU2Vhc29uIiwgInRlYW0xX2lkIiksIGFsbC54ID0gVFJVRSkNCnRyYWluaW5nIDwtIG1lcmdlKHggPSB0cmFpbmluZywgeSA9IHNlZWRzMiwgYnkgPSBjKCJTZWFzb24iLCAidGVhbTJfaWQiKSwgYWxsLnggPSBUUlVFKQ0KYGBgDQoNCg0KYGBge3J9DQojIExvY2F0ZXMgYWxsIG5hJ3MgaW4gZGF0YSBhbmQgcmVwbGFjZXMgdGhlbSB3aXRoIDIwJ3MNCnRyYWluaW5nJHRlYW0xX1NlZWQgPC0gaWZlbHNlKGlzLm5hKHRyYWluaW5nJHRlYW0xX1NlZWQpLCAyMCwgdHJhaW5pbmckdGVhbTFfU2VlZCkNCnRyYWluaW5nJHRlYW0yX1NlZWQgPC0gaWZlbHNlKGlzLm5hKHRyYWluaW5nJHRlYW0yX1NlZWQpLCAyMCwgdHJhaW5pbmckdGVhbTJfU2VlZCkNCg0Kc3VtbWFyeSh0cmFpbmluZykNCmBgYA0KDQpMb2FkIENvYWNoIG5hbWVzIGFuZCBmb3JtYXQgYWNjb3JkaW5nbHkNCmBgYHtyfQ0KY29hY2hlcyA8LSByZWFkLmNzdigiZGF0YS9UZWFtQ29hY2hlcy5jc3YiKQ0KY29hY2hlcyA8LSBzdWJzZXQoY29hY2hlcywgTGFzdERheU51bT09MTU0KQ0KY29hY2hlcyA8LSBjb2FjaGVzW2MoIlNlYXNvbiIsICJUZWFtSUQiLCAiQ29hY2hOYW1lIildDQpjb2FjaGVzJENvYWNoTmFtZSA8LSBhcy5jaGFyYWN0ZXIoY29hY2hlcyRDb2FjaE5hbWUpDQpjb2FjaGVzMSA8LSBjb2FjaGVzDQpuYW1lcyhjb2FjaGVzMSkgPC0gYygiU2Vhc29uIiwgInRlYW0xX2lkIiwgInRlYW0xX0NvYWNoIikNCmNvYWNoZXMyIDwtIGNvYWNoZXMNCm5hbWVzKGNvYWNoZXMyKSA8LSBjKCJTZWFzb24iLCAidGVhbTJfaWQiLCAidGVhbTJfQ29hY2giKQ0KYGBgDQoNCg0KYGBge3J9DQojIExlZnQgb3V0ZXIgam9pbnMgdG8gYXNzb2NpYXRlIGNvYWNoIGRhdGENCnRyYWluaW5nIDwtIG1lcmdlKHggPSB0cmFpbmluZywgeSA9IGNvYWNoZXMxLCBieSA9IGMoIlNlYXNvbiIsICJ0ZWFtMV9pZCIpLCBhbGwueCA9IFRSVUUpDQp0cmFpbmluZyA8LSBtZXJnZSh4ID0gdHJhaW5pbmcsIHkgPSBjb2FjaGVzMiwgYnkgPSBjKCJTZWFzb24iLCAidGVhbTJfaWQiKSwgYWxsLnggPSBUUlVFKQ0KYGBgDQoNCg0KTG9hZCBDb25mZXJlbmNlIERhdGEgYW5kIGZvcm1hdCBhY2NvcmRpbmdseQ0KYGBge3J9DQpjb25mZXJlbmNlIDwtIHJlYWQuY3N2KCJkYXRhL1RlYW1Db25mZXJlbmNlcy5jc3YiKQ0KY29uZmVyZW5jZSRDb25mQWJicmV2IDwtIGFzLmNoYXJhY3Rlcihjb25mZXJlbmNlJENvbmZBYmJyZXYpDQpjb25mZXJlbmNlMSA8LSBjb25mZXJlbmNlDQpuYW1lcyhjb25mZXJlbmNlMSkgPC0gYygiU2Vhc29uIiwgInRlYW0xX2lkIiwgInRlYW0xX2NvbmZlcmVuY2UiKQ0KY29uZmVyZW5jZTIgPC0gY29uZmVyZW5jZQ0KbmFtZXMoY29uZmVyZW5jZTIpIDwtIGMoIlNlYXNvbiIsICJ0ZWFtMl9pZCIsICJ0ZWFtMl9jb25mZXJlbmNlIikNCmBgYA0KDQpgYGB7cn0NCiMgTGVmdCBvdXRlciBqb2lucyB0byBhc3NvY2lhdGUgY29hY2ggZGF0YQ0KdHJhaW5pbmcgPC0gbWVyZ2UoeCA9IHRyYWluaW5nLCB5ID0gY29uZmVyZW5jZTEsIGJ5ID0gYygiU2Vhc29uIiwgInRlYW0xX2lkIiksIGFsbC54ID0gVFJVRSkNCnRyYWluaW5nIDwtIG1lcmdlKHggPSB0cmFpbmluZywgeSA9IGNvbmZlcmVuY2UyLCBieSA9IGMoIlNlYXNvbiIsICJ0ZWFtMl9pZCIpLCBhbGwueCA9IFRSVUUpDQpgYGANCg0KTm9ybWFsaXplIHRoZSBmZWF0dXJlIHZpYSBaLXNjb3JlDQpgYGB7cn0NCnRyYWluaW5nJHRlYW0xX1NlZWQgPSAodHJhaW5pbmckdGVhbTFfU2VlZCAtIG1lYW4odHJhaW5pbmckdGVhbTFfU2VlZCkpL3NkKHRyYWluaW5nJHRlYW0xX1NlZWQpDQoNCnRyYWluaW5nJHRlYW0yX1NlZWQgPSAodHJhaW5pbmckdGVhbTJfU2VlZCAtIG1lYW4odHJhaW5pbmckdGVhbTJfU2VlZCkpL3NkKHRyYWluaW5nJHRlYW0yX1NlZWQpDQpgYGANCg0KVHJhaW4gTk4NCmBgYHtyfQ0KbGlicmFyeShuZXVyYWxuZXQpDQpmIDwtIGFzLmZvcm11bGEoJ3Jlc3VsdH50ZWFtMV9TZWVkK3RlYW0yX1NlZWQrdGVhbTFfQ29hY2grdGVhbTJfQ29hY2grdGVhbTFfY29uZmVyZW5jZSt0ZWFtMl9jb25mZXJlbmNlJykNCm5uIDwtIG5ldXJhbG5ldChmLCBkYXRhPXRyYWluaW5nLCBoaWRkZW49Yyg1LDMpLGxpbmVhci5vdXRwdXQ9RkFMU0UpDQpgYGANCg0KUHJlZGljdCByZXN1bHRzICYgY3JlYXRlIHN1Ym1pc3Npb24gZmlsZQ0KYGBge3J9DQpOQ0FBUHJlZGljdGlvbnM8LSBjb21wdXRlKG5uLHRlc3REYXRhRVhbNjo4XSkNCg0KTkNBQVByZWRpY3Rpb25zDQogIA0KICBwcmVkaWN0KGxvZ2l0TW9kZWwsdGVzdERhdGFFWCx0eXBlPSJyZXNwb25zZSIpDQpoZWFkKHRlc3REYXRhRVgpDQpvdXRwdXRGcmFtZTwtdGVzdERhdGFFWFswXQ0Kb3V0cHV0RnJhbWUkSUQ8LXBhc3RlKHRlc3REYXRhRVgkU2Vhc29uLHRlc3REYXRhRVgkVGVhbTEsdGVzdERhdGFFWCRUZWFtMixzZXAgPSJfIikNCm91dHB1dEZyYW1lJFByZWQ8LU5DQUFQcmVkaWN0aW9ucw0KaGVhZChvdXRwdXRGcmFtZSkNCg0Kd3JpdGUuY3N2KG91dHB1dEZyYW1lLCJ0ZXN0T3V0cHV0LmNzdiIpDQpgYGANCg0KDQoNCg0KDQo=</div>
+>>>>>>> parent of 78baa00... Added Merged CSV
 
 
 

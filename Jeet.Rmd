@@ -111,42 +111,210 @@ names(conference2) <- c("Season", "team2_id", "team2_conference")
 ```
 
 ```{r}
+<<<<<<< HEAD
+rankings1 <- rankings
+names(rankings1) <- c("Season", "team1_id", "team1_avgranking", "team1_sdranking")
+rankings2 <- rankings
+names(rankings2) <- c("Season", "team2_id", "team2_avg_ranking", "team2_sd_ranking")
+
+# Left outer joins to associate ranking data
+training <- merge(x = training, y = rankings1, by = c("Season", "team1_id"), all.x = TRUE)
+training <- merge(x = training, y = rankings2, by = c("Season", "team2_id"), all.x = TRUE)
+rm(rankings, rankings1, rankings2)
+```
+
+
+Merging in Win/Loss Record
+```{r}
+winloss <- read.csv("compiled-features/allteams-allseason-winloss.csv")
+winloss <- winloss[,c(1:2, 11:15)]
+
+winloss1 <- winloss
+names(winloss1)[2] <- "team1_id"
+names(winloss1)[3:7] <- paste(sep = "_", "team1", names(winloss1)[3:7])
+
+winloss2 <- winloss
+names(winloss2)[2] <- "team2_id"
+names(winloss2)[3:7] <- paste(sep = "_", "team2", names(winloss1)[3:7])
+
+# Left outer joins to associate win/loss data
+training <- merge(x = training, y = winloss1, by = c("Season", "team1_id"), all.x = TRUE)
+training <- merge(x = training, y = winloss2, by = c("Season", "team2_id"), all.x = TRUE)
+rm(winloss, winloss1, winloss2)
+```
+
+
+Merging in Average Stats
+```{r}
+<<<<<<< HEAD
+# Selecting the scope of the data
+#data2003 <- subset(data, Season < 2014)
+#training2 <- subset(data, Season == 2014)
+#training2 <- subset(training2, post == 0)
+
+#data2003 <- union_all(data2003, training2)
+#rm(training2)
+
+data <- na.omit(data)
+=======
+avgStats <- read.csv("compiled-features/allteams-allseason-averages.csv")
+
+avgStats1 <- avgStats
+names(avgStats1)[2] <- "team1_id"
+names(avgStats1)[3:16] <- paste(sep = "_", "team1", names(avgStats1)[3:16])
+
+avgStats2 <- avgStats
+names(avgStats2)[2] <- "team2_id"
+names(avgStats2)[3:16] <- paste(sep = "_", "team2", names(avgStats2)[3:16])
+
+# Left outer joins to associate win/loss data
+training <- merge(x = training, y = avgStats1, by = c("Season", "team1_id"), all.x = TRUE)
+training <- merge(x = training, y = avgStats2, by = c("Season", "team2_id"), all.x = TRUE)
+rm(avgStats, avgStats1, avgStats2)
+```
+
+Merging in Standard Deviation of Stats
+```{r}
+sdStats <- read.csv("compiled-features/allteams-allseason-SD.csv")
+
+sdStats1 <- sdStats
+names(sdStats1)[2] <- "team1_id"
+names(sdStats1)[3:16] <- paste(sep = "_", "team1_sd_", names(sdStats1)[3:16])
+
+sdStats2 <- sdStats
+names(sdStats2)[2] <- "team2_id"
+names(sdStats2)[3:16] <- paste(sep = "_", "team2_sd_", names(sdStats2)[3:16])
+
+# Left outer joins to associate win/loss data
+training <- merge(x = training, y = sdStats1, by = c("Season", "team1_id"), all.x = TRUE)
+training <- merge(x = training, y = sdStats2, by = c("Season", "team2_id"), all.x = TRUE)
+rm(sdStats, sdStats1, sdStats2)
+```
+
+Merging in Years of Experience
+```{r}
+Stats <- read.csv("compiled-features/experience.csv")
+Stats[,1] <- NULL
+
+Stats1 <- Stats
+names(Stats1)<- c("Season", "team1_id", "team1_avgExp", "team1_sdExp")
+
+Stats2 <- Stats
+names(Stats2)<- c("Season", "team2_id", "team2_avgExp", "team2_sdExp")
+
+# Left outer joins to associate win/loss data
+training <- merge(x = training, y = Stats1, by = c("Season", "team1_id"), all.x = TRUE)
+training <- merge(x = training, y = Stats2, by = c("Season", "team2_id"), all.x = TRUE)
+rm(Stats, Stats1, Stats2)
+```
+
+
+Merging in Pts Against data
+```{r}
+Stats <- read.csv("compiled-features/ptsAgainst.csv")
+Stats[,1] <- NULL
+
+Stats1 <- Stats
+names(Stats1)<- c("Season", "team1_id", "team1_avg_pts_against", "team1_sd_pts_against")
+
+Stats2 <- Stats
+names(Stats2)<- c("Season", "team2_id", "team2_avg_pts_against", "team2_sd_pts_against")
+
+# Left outer joins to associate win/loss data
+training <- merge(x = training, y = Stats1, by = c("Season", "team1_id"), all.x = TRUE)
+training <- merge(x = training, y = Stats2, by = c("Season", "team2_id"), all.x = TRUE)
+rm(Stats, Stats1, Stats2)
+```
+
+```{r}
+write.csv(training, "trainingSet.csv")
+>>>>>>> parent of ea034fa... Changed Summary File
+```
+
+This section of code takes all the columns from teams 1 and 2, adds them together and calculates how much team1's numbers represent as a proportion of the sum
+```{r}
+<<<<<<< HEAD
+x <- names(data)
+
+x1 <- unlist(subset(x, grepl("team1",x)))
+x2 <- unlist(subset(x, grepl("team2",x)))
+
+dataSet <- data[,2:6]
+
+len <- length(x1)
+
+
+for(i in 2:len){
+  column <- substr(x1[i], 7, nchar(x1[i]))
+  c1 <- x1[i]
+  c2 <- x2[i]
+  #Added a 0.0000001 in the denominator to prevent division errors
+  dataSet[,column] <- data[c1]/(data[c1]+data[c2]+0.000001)
+}
+
+dataSet <- dataSet[dataSet$post==1,]
+rm(x, x1, x2, c1, c2)
+=======
 # Left outer joins to associate coach data
 training <- merge(x = training, y = conference1, by = c("Season", "team1_id"), all.x = TRUE)
 training <- merge(x = training, y = conference2, by = c("Season", "team2_id"), all.x = TRUE)
+>>>>>>> parent of 78baa00... Added Merged CSV
 ```
+
 
 Normalize the feature via Z-score
 ```{r}
+col <- dim(dataSet)[2]
+normData <- dataSet
+for(i in 7:col){
+  normData[,i] = (normData[,i] - mean(normData[,i]))/sd(normData[,i])
+}
+=======
 training$team1_Seed = (training$team1_Seed - mean(training$team1_Seed))/sd(training$team1_Seed)
 
 training$team2_Seed = (training$team2_Seed - mean(training$team2_Seed))/sd(training$team2_Seed)
+>>>>>>> parent of ea034fa... Changed Summary File
 ```
+
+Split the data into a training and a testing set
+```{r}
+numSamples <- dim(normData)[1]
+sampling.rate = 0.8
+
+trainingIndex <- sample(1:numSamples, numSamples*sampling.rate, replace = FALSE)
+trainingSet <- normData[trainingIndex,]
+
+testingIndex <- setdiff(1:numSamples, trainingIndex)
+testingSet <- normData[testingIndex,]
+```
+
 
 Train NN
 ```{r}
 library(neuralnet)
+<<<<<<< HEAD
+f <- paste(names(trainingSet)[6:col], collapse = '+')
+f<- paste('result~', f)
+#f <- as.formula('result~.-Season-team2_id-team1_id-post')
+nn <- neuralnet(f, data=trainingSet, hidden=c(18,4),linear.output=FALSE)
+=======
 f <- as.formula('result~team1_Seed+team2_Seed+team1_Coach+team2_Coach+team1_conference+team2_conference')
 nn <- neuralnet(f, data=training, hidden=c(5,3),linear.output=FALSE)
+>>>>>>> parent of ea034fa... Changed Summary File
 ```
 
-Predict results & create submission file
+Predict results of Testing Set
 ```{r}
-NCAAPredictions<- compute(nn,testDataEX[6:8])
+predictions <- compute(nn,testingSet[,6:43])
 
-NCAAPredictions
-  
-  predict(logitModel,testDataEX,type="response")
-head(testDataEX)
-outputFrame<-testDataEX[0]
-outputFrame$ID<-paste(testDataEX$Season,testDataEX$Team1,testDataEX$Team2,sep ="_")
-outputFrame$Pred<-NCAAPredictions
-head(outputFrame)
+predictions <- predictions$net.result
+roundedPredictions <- round(predictions)
 
-write.csv(outputFrame,"testOutput.csv")
+sizeTest <- dim(predictions)[1]
+error = sum(roundedPredictions != testingSet$result)
+misclassification = error / sizeTest
+
+misclassification
 ```
-
-
-
 
 
