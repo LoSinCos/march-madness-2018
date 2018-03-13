@@ -1,6 +1,11 @@
+<<<<<<< HEAD
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
 march-madness-local-mac.Rproj
 data
+=======
+
+*.csv
+>>>>>>> e63a7b7438b165728891fce81d3b2b148e89a582
