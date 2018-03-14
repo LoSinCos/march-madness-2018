@@ -1,0 +1,28 @@
+---
+title: "Points Against"
+output: html_notebook
+---
+
+
+```{r}
+regResults <- read.csv("../data/RegularSeasonCompactResults.csv")
+regResults <- regResults[,c("Season", "WTeamID", "WScore", "LTeamID", "LScore")]
+
+output1 <- regResults[,c("Season", "WTeamID", "LScore")]
+names(output1) <- c("Season", "teamID", "pointsAgainst")
+
+output2 <- regResults[,c("Season", "LTeamID", "WScore")]
+names(output2) <- c("Season", "teamID", "pointsAgainst")
+
+outputmid <- union_all(output1, output2)
+```
+
+
+```{r}
+output <- aggregate(outputmid$pointsAgainst, list(outputmid$Season, outputmid$teamID), mean)
+
+output$sd <- aggregate(outputmid$pointsAgainst, list(outputmid$Season, outputmid$teamID), sd)[,3]
+
+names(output) <- c("Season", "teamID", "mean_pts_against", "sd_pts_against")
+write.csv(output,"ptsAgainst.csv")
+```

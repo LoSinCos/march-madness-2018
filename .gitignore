@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 .Rproj.user
 .Rhistory
 .RData
@@ -24,3 +25,7 @@ data
 march-madness.Rproj
 >>>>>>> 6c29a23c8fa6f8ddb981e93118e16e1954aff960
 >>>>>>> 081972e69a587342a7d8d9d6a07fad35e03168c2
+=======
+data
+trainingSet.csv
+>>>>>>> 0579b28f16cd6fced713413f2ec37475b7758306
