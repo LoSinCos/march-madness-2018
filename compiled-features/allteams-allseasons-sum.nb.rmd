@@ -1,0 +1,144 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+#Load libraries
+library(dplyr)
+```
+
+```{r}
+#Load in the data 
+seasonResults <- read.csv("../data/RegularSeasonDetailedResults.csv", header = TRUE)
+head(seasonResults)
+```
+
+
+```{r}
+#change the column names so that they are identical for merging
+names(seasonResults) <- gsub(x = names(seasonResults), pattern = "WTeam", replacement = "Team")
+names(seasonResults) <- gsub(x = names(seasonResults), pattern = "LTeam", replacement = "Team")
+names(seasonResults) <- gsub(x = names(seasonResults), pattern = "W", replacement = "")
+names(seasonResults) <- gsub(x = names(seasonResults), pattern = "L", replacement = "")
+
+#combine WTeam and LTeam stats
+seasonResultsCompiled <- bind_rows(seasonResults[,c(1,3:4,9:21)],seasonResults[,c(1,5:6,22:34)])
+head(seasonResultsCompiled)
+```
+
+
+```{r}
+#find all unique values by BOTH Season and TeamID
+#this will be the skeleton of the final database we want
+seasonResultsCompiledUnique <- distinct(seasonResultsCompiled,Season, TeamID, .keep_all = TRUE)
+
+#loop through all the unique values
+for (i in 1:NROW(seasonResultsCompiledUnique)){
+    
+    #we want to replace the per game data in each row of the unique data frame with averages for that team in that season
+    #first filter the FULL season results by two variables, the current row SEASON and TEAM ID
+    #then only select the rows where an average can be computed
+    #compute the average of the filtered and selected 14 columns and insert those 14 rows into the respective row of the unique data frame
+    seasonResultsCompiledUnique[i,c(3:16)] <- colSums(seasonResultsCompiled %>%
+      filter(Season == seasonResultsCompiledUnique[i,1], TeamID == seasonResultsCompiledUnique[i,2]) %>%
+      select(-(Season:TeamID)))
+}
+
+
+
+```
+
+
+```{r}
+#prefix cols
+colnames(seasonResultsCompiledUnique)[c(3:16)] <- paste("Sum", colnames(seasonResultsCompiledUnique[,c(3:16)]), sep = "_")
+
+#calculate OffRtg
+seasonResultsCompiledUnique <- seasonResultsCompiledUnique %>% 
+  mutate(OffRtg = (100 * Sum_Score / (Sum_FGA + Sum_TO + (0.44 * Sum_FTA) - Sum_OR)))
+
+```
+
+
+```{r}
+
+seasonResultsCompiledUnique[,paste("Opp", colnames(seasonResultsCompiledUnique)[c(3:16)], sep = "_")] <- NA
+
+```
+
+
+```{r}
+seasonResults <- read.csv("../data/RegularSeasonDetailedResults.csv", header = TRUE)
+
+#loop through all the unique values
+for (i in 1:NROW(seasonResultsCompiledUnique)){
+    
+    #we want to replace the per game data in each row of the unique data frame with averages for that team in that season
+    #first filter the FULL season results by two variables, the current row SEASON and TEAM ID
+    #then only select the rows where an average can be computed
+    #compute the average of the filtered and selected 14 columns and insert those 14 rows into the respective row of the unique data frame
+    
+  a <- colSums(seasonResults %>%
+  filter(Season == seasonResultsCompiledUnique[i,1], WTeamID == seasonResultsCompiledUnique[i,2]) %>%
+  select(LScore, LFGM:LPF))
+  
+  b <- colSums(seasonResults %>%
+    filter(Season == seasonResultsCompiledUnique[i,1], LTeamID == seasonResultsCompiledUnique[i,2]) %>%
+    select(WScore, WFGM:WPF))
+  
+  #change the column names so that they are identical for merging
+  names(a) <- gsub(x = names(a), pattern = "W", replacement = "")
+  names(b) <- gsub(x = names(b), pattern = "L", replacement = "")
+  
+  c <- rbind(a,b)
+  
+  seasonResultsCompiledUnique[i,c(18:31)] <- colSums(c)
+}
+
+
+```
+
+```{r}
+#calculate OffRtg
+seasonResultsCompiledUnique <- seasonResultsCompiledUnique %>% 
+  mutate(DefRtg = (100 * Opp_Sum_Score / (Opp_Sum_FGA + Opp_Sum_TO + (0.44 * Opp_Sum_FTA) - Opp_Sum_OR)))
+```
+
+```{r}
+#calculate ORper
+seasonResultsCompiledUnique <- seasonResultsCompiledUnique %>% 
+  mutate(ORper = Sum_OR/(Opp_Sum_DR+Sum_OR))
+
+#calculate DRper
+seasonResultsCompiledUnique <- seasonResultsCompiledUnique %>% 
+  mutate(DRper = Sum_DR/(Opp_Sum_OR+Sum_DR))
+```
+
+
+```{r}
+#calculate net rating
+seasonResultsCompiledUnique <- seasonResultsCompiledUnique %>% 
+  mutate(NetRtg = OffRtg - DefRtg)
+head(seasonResultsCompiledUnique)
+```
+
+
+```{r}
+#write to file
+write.csv(seasonResultsCompiledUnique, file = "allteams-allseason-sum.csv", row.names = FALSE)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
