@@ -112,6 +112,10 @@ sizeTest <- dim(predictions)[1]
 error = sum(roundedPredictions != testingSet$result)
 misclassification = error / sizeTest
 
+library(MLmetrics)
+logloss <- LogLoss(y_pred = predictions, y_true = testingSet$result)
+
+logloss
 misclassification
 ```
 
