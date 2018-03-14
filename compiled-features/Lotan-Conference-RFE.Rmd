@@ -1,0 +1,155 @@
+---
+title: "ConferenceRFE"
+author: "Lotan Weininger"
+date: "March 13, 2018"
+output: html_document
+---
+```{r}
+#Load libraries
+library(dplyr)
+#Load in the data 
+TeamConferences <- read.csv("../data/TeamConferences.csv", header = TRUE)
+head(TeamConferences)
+```
+
+```{r}
+CompactResults <- read.csv("../data/RegularSeasonCompactResults.csv", header = TRUE)
+head(CompactResults)
+```
+
+```{r}
+CompactResults <- CompactResults[,c(1,3,5)]
+head(CompactResults)
+```
+
+
+```{r}
+#join all of the data
+ConferenceData <- left_join(CompactResults,TeamConferences, by = c("WTeamID" = "TeamID", "Season" = "Season"))
+
+```
+
+```{r}
+ConferenceData2 <- left_join(ConferenceData,TeamConferences, by = c("LTeamID" = "TeamID", "Season" = "Season"))
+```
+
+#Create column with 1,0 for victories/losses
+```{r}
+ConferenceData2$Result <- 1
+```
+
+#Get rid of W and L
+```{r}
+names(ConferenceData2) <- c("Season", "Team1ID", "Team2ID", "Team1Conference", "Team2Conference", "Result")
+```
+
+```{r}
+#duplicate data
+ConferenceDataReverse <- ConferenceData2
+
+#reverse the result
+ConferenceDataReverse <- ConferenceDataReverse %>%
+     mutate(Result = replace(Result, Result == 1, 0)) %>%
+     as.data.frame()
+
+#rename Team 1 to Team 2 and vice versa
+names(ConferenceDataReverse) <- gsub(x = names(ConferenceDataReverse), pattern = "Team1", replacement = "temp1")
+names(ConferenceDataReverse) <- gsub(x = names(ConferenceDataReverse), pattern = "Team2", replacement = "temp2")
+names(ConferenceDataReverse) <- gsub(x = names(ConferenceDataReverse), pattern = "temp1", replacement = "Team2")
+names(ConferenceDataReverse) <- gsub(x = names(ConferenceDataReverse), pattern = "temp2", replacement = "Team1")
+
+#reorder columns manually (TODO: this could probably be done better)
+ConferenceDataReverse <- ConferenceDataReverse[,c(1,3,2,5,4,6)]
+head(ConferenceDataReverse)
+
+#bind datasets together
+ConferenceTotalSet <- rbind(ConferenceData2,ConferenceDataReverse)
+ConferenceTotalSet <- ConferenceTotalSet %>%
+  filter(Season == 2010:2017)
+head(ConferenceTotalSet)
+
+#trainingSet <- trainingSet[complete.cases(trainingSet),]
+
+```
+
+```{r}
+library(data.table)
+setDT(ConferenceTotalSet)[, c(levels(ConferenceTotalSet$Team1Conference), "Team1Conference") := 
+    c(lapply(levels(ConferenceTotalSet$Team1Conference), function(x) as.integer(x == ConferenceTotalSet$Team1Conference)), .(NULL))]
+```
+
+
+
+```{r}
+numSamples <- nrow(ConferenceTotalSet)
+sampleRate <- 0.8
+trainingRows <- sample(1:numSamples, sampleRate*numSamples, replace = FALSE)
+trainingSet <- ConferenceTotalSet[trainingRows,]
+testingRows <- setdiff(1:numSamples, trainingRows)
+testingSet <- ConferenceTotalSet[testingRows,]
+```
+
+```{r}
+NROW(trainingSet$Result)
+NROW(trainingSet$a_sun)
+```
+
+```{r}
+#head(trainingSet)
+trainingSet$Result <- as.factor(trainingSet$Result)
+head(trainingSet)
+```
+
+
+#Run the RFE
+```{r}
+for (i in 1:10){
+  
+numSamples <- nrow(trainingSet)
+sampleRate <- 0.1
+trainingRows <- sample(1:numSamples, sampleRate*numSamples, replace = FALSE)
+trainingSet2 <- ConferenceTotalSet[trainingRows,]
+# ensure the results are repeatable
+
+y <- trainingSet2$Result
+
+# load the library
+library(caret)
+# load the data
+data(trainingSet)
+# define the control using a random forest selection function
+control <- rfeControl(functions=rfFuncs, method="cv", number=5)
+# run the RFE algorithm
+results <- rfe(trainingSet2[,6:56], y, sizes=(6:56), rfeControl=control)
+# summarize the results
+print(results)
+# list the chosen features
+predictors(results)
+# plot the results
+plot(results, type=c("g", "o"))
+
+}
+```
+
+
+```{r}
+#loop through all the unique values
+library(matrixStats)
+for (i in 1:NROW(seasonResultsCompiledUnique)){
+    
+    #we want to replace the per game data in each row of the unique data frame with averages for that team in that season
+    #first filter the FULL season results by two variables, the current row SEASON and TEAM ID
+    #then only select the rows where an average can be computed
+    #compute the average of the filtered and selected 14 columns and insert those 14 rows into the respective row of the unique data frame
+    seasonResultsCompiledUnique[i,c(3:16)] <- sapply((seasonResultsCompiled %>%
+      filter(Season == seasonResultsCompiledUnique[i,1], TeamID == seasonResultsCompiledUnique[i,2]) %>%
+      select(-(Season:TeamID))), sd)
+}
+```
+
+```{r}
+#write to file
+write.csv(seasonResultsCompiledUnique, file = "allteams-allseason-SD.csv", row.names = FALSE)
+```
+```
+
