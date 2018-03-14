@@ -1,0 +1,155 @@
+---
+title: "Jeet - Experimenting"
+output: html_notebook
+---
+
+
+Set testing year
+```{r}
+library(stringr)
+year<-2014
+```
+
+
+Pull seed data and tourney results
+```{r}
+# load data need data files Seeds, Results, Conferences, and Coaches
+seeds <- read.csv("../data/NCAATourneySeeds.csv")
+results <- read.csv("../data/RegularSeasonCompactResults.csv")
+results<-subset(results,Season<year)
+testData<-read.csv("../data/SampleSubmissionStage1.csv")
+```
+
+```{r}
+head(seeds)
+head(results)
+
+# Extracts seed number
+seeds$Seed <- as.integer(str_extract_all(seeds$Seed, "[0-9]+"))
+```
+
+```{r}
+#Taking out results before 2014 for Round 1 Prediction (2014-2017)
+results <- subset(results,Season < 2014)
+head(results)
+
+library(dplyr)
+
+# Copies the results into 
+transformed1 <- results
+transformed2 <- results
+
+# Changes format to be similar to test file
+transformed1 <- mutate(transformed1,
+  team1_id = WTeamID,
+  team2_id = LTeamID,
+  result = 1)
+
+transformed2 <- mutate(transformed2,
+  team1_id = LTeamID,
+  team2_id = WTeamID,
+  result = 0)
+
+# Gets only relevant data
+transformed1 <- transformed1[c("Season","team1_id", "team2_id", "result")]
+transformed2 <- transformed2[c("Season","team1_id", "team2_id", "result")]
+
+# Doubles the rows to switch around team1 and team 2 and include a loss
+training <- union_all(transformed1,transformed2)
+```
+
+
+```{r}
+# Copies seeds into other databases for merging
+seeds1 <- seeds
+names(seeds1) <- c("Season", "team1_Seed", "team1_id")
+seeds2 <- seeds
+names(seeds2) <- c("Season", "team2_Seed", "team2_id")
+
+# Left outer joins to associate seed data
+training <- merge(x = training, y = seeds1, by = c("Season", "team1_id"), all.x = TRUE)
+training <- merge(x = training, y = seeds2, by = c("Season", "team2_id"), all.x = TRUE)
+```
+
+
+```{r}
+# Locates all na's in data and replaces them with 20's
+training$team1_Seed <- ifelse(is.na(training$team1_Seed), 20, training$team1_Seed)
+training$team2_Seed <- ifelse(is.na(training$team2_Seed), 20, training$team2_Seed)
+
+summary(training)
+```
+
+Load Coach names and format accordingly
+```{r}
+coaches <- read.csv("../data/TeamCoaches.csv")
+coaches <- subset(coaches, LastDayNum==154)
+coaches <- coaches[c("Season", "TeamID", "CoachName")]
+coaches$CoachName <- lapply(coaches$CoachName, as.character)
+coaches1 <- coaches
+names(coaches1) <- c("Season", "team1_id", "team1_Coach")
+coaches2 <- coaches
+names(coaches2) <- c("Season", "team2_id", "team2_Coach")
+```
+
+
+```{r}
+# Left outer joins to associate coach data
+training <- merge(x = training, y = coaches1, by = c("Season", "team1_id"), all.x = TRUE)
+training <- merge(x = training, y = coaches2, by = c("Season", "team2_id"), all.x = TRUE)
+```
+
+
+Load Conference Data and format accordingly
+```{r}
+conference <- read.csv("../data/TeamConferences.csv")
+conference$ConfAbbrev <- lapply(conference$ConfAbbrev, as.character)
+conference1 <- conference
+names(conference1) <- c("Season", "team1_id", "team1_conference")
+conference2 <- conference
+names(conference2) <- c("Season", "team2_id", "team2_conference")
+```
+
+```{r}
+# Left outer joins to associate coach data
+training <- merge(x = training, y = conference1, by = c("Season", "team1_id"), all.x = TRUE)
+training <- merge(x = training, y = conference2, by = c("Season", "team2_id"), all.x = TRUE)
+```
+
+Normalize the feature via Z-score
+```{r}
+resultsEX$seed_diff = (resultsEX$seed_diff - mean(resultsEx$seed_diff))/sd(resultsEX$seed_diff)
+
+resultsEX$team1_seed_str = (resultsEX$team1_seed_str - mean(resultsEx$team1_seed_str))/sd(resultsEX$team1_seed_str)
+
+resultsEX$team2_seed_str = (resultsEX$team2_seed_str - mean(resultsEx$team2_seed_str))/sd(resultsEX$team2_seed_str)
+```
+
+Train NN
+```{r}
+library(neuralnet)
+resultsEX <- na.omit(resultsEX)
+f <- as.formula('result~seed_diff+team1_seed_str+team2_seed_str')
+#nn <- neuralnet(f, data=resultsEX, hidden=c(5,3),linear.output=FALSE)
+```
+
+Predict results & create submission file
+```{r}
+NCAAPredictions<- compute(nn,testDataEX[6:8])
+
+NCAAPredictions
+  
+  predict(logitModel,testDataEX,type="response")
+head(testDataEX)
+outputFrame<-testDataEX[0]
+outputFrame$ID<-paste(testDataEX$Season,testDataEX$Team1,testDataEX$Team2,sep ="_")
+outputFrame$Pred<-NCAAPredictions
+head(outputFrame)
+
+write.csv(outputFrame,"testOutput.csv")
+```
+
+
+
+
+

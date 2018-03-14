@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 .Rproj.user
 .Rhistory
 .RData
@@ -9,3 +10,17 @@ data
 
 *.csv
 >>>>>>> e63a7b7438b165728891fce81d3b2b148e89a582
+=======
+=======
+
+>>>>>>> 6c29a23c8fa6f8ddb981e93118e16e1954aff960
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+<<<<<<< HEAD
+=======
+data
+march-madness.Rproj
+>>>>>>> 6c29a23c8fa6f8ddb981e93118e16e1954aff960
+>>>>>>> 081972e69a587342a7d8d9d6a07fad35e03168c2
