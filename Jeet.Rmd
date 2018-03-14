@@ -13,15 +13,7 @@ library(stringr)
 Pull data and tourney results
 Pull seed data and tourney results
 ```{r}
-<<<<<<< HEAD
-# load data need data files Seeds, Results, Conferences, and Coaches
-seeds <- read.csv("../data/NCAATourneySeeds.csv")
-results <- read.csv("../data/RegularSeasonCompactResults.csv")
-results<-subset(results,Season<year)
-testData<-read.csv("../data/SampleSubmissionStage1.csv")
-=======
 data <- read.csv("compiled-features/trainingSet.csv")
->>>>>>> 0579b28f16cd6fced713413f2ec37475b7758306
 ```
 
 ```{r}
@@ -63,21 +55,7 @@ x2 <- unlist(subset(x, grepl("team2",x)))
 
 dataSet <- data[,2:6]
 
-<<<<<<< HEAD
-Load Coach names and format accordingly
-```{r}
-coaches <- read.csv("../data/TeamCoaches.csv")
-coaches <- subset(coaches, LastDayNum==154)
-coaches <- coaches[c("Season", "TeamID", "CoachName")]
-coaches$CoachName <- lapply(coaches$CoachName, as.character)
-coaches1 <- coaches
-names(coaches1) <- c("Season", "team1_id", "team1_Coach")
-coaches2 <- coaches
-names(coaches2) <- c("Season", "team2_id", "team2_Coach")
-```
-=======
 len <- length(x1)
->>>>>>> 0579b28f16cd6fced713413f2ec37475b7758306
 
 
 for(i in 2:len){
@@ -95,20 +73,11 @@ rm(x, x1, x2, c1, c2)
 
 Normalize the feature via Z-score
 ```{r}
-<<<<<<< HEAD
-conference <- read.csv("../data/TeamConferences.csv")
-conference$ConfAbbrev <- lapply(conference$ConfAbbrev, as.character)
-conference1 <- conference
-names(conference1) <- c("Season", "team1_id", "team1_conference")
-conference2 <- conference
-names(conference2) <- c("Season", "team2_id", "team2_conference")
-=======
 col <- dim(dataSet)[2]
 normData <- dataSet
 for(i in 7:col){
   normData[,i] = (normData[,i] - mean(normData[,i]))/sd(normData[,i])
 }
->>>>>>> 0579b28f16cd6fced713413f2ec37475b7758306
 ```
 
 Split the data into a training and a testing set
@@ -116,37 +85,21 @@ Split the data into a training and a testing set
 numSamples <- dim(normData)[1]
 sampling.rate = 0.8
 
-<<<<<<< HEAD
-Normalize the feature via Z-score
-```{r}
-resultsEX$seed_diff = (resultsEX$seed_diff - mean(resultsEx$seed_diff))/sd(resultsEX$seed_diff)
-
-resultsEX$team1_seed_str = (resultsEX$team1_seed_str - mean(resultsEx$team1_seed_str))/sd(resultsEX$team1_seed_str)
-
-resultsEX$team2_seed_str = (resultsEX$team2_seed_str - mean(resultsEx$team2_seed_str))/sd(resultsEX$team2_seed_str)
-=======
 trainingIndex <- sample(1:numSamples, numSamples*sampling.rate, replace = FALSE)
 trainingSet <- normData[trainingIndex,]
 
 testingIndex <- setdiff(1:numSamples, trainingIndex)
 testingSet <- normData[testingIndex,]
->>>>>>> 0579b28f16cd6fced713413f2ec37475b7758306
 ```
 
 
 Train NN
 ```{r}
 library(neuralnet)
-<<<<<<< HEAD
-resultsEX <- na.omit(resultsEX)
-f <- as.formula('result~seed_diff+team1_seed_str+team2_seed_str')
-#nn <- neuralnet(f, data=resultsEX, hidden=c(5,3),linear.output=FALSE)
-=======
 f <- paste(names(trainingSet)[6:col], collapse = '+')
 f<- paste('result~', f)
 #f <- as.formula('result~.-Season-team2_id-team1_id-post')
 nn <- neuralnet(f, data=trainingSet, hidden=c(18,4),linear.output=FALSE)
->>>>>>> 0579b28f16cd6fced713413f2ec37475b7758306
 ```
 
 ```{r}
@@ -165,4 +118,3 @@ logloss <- LogLoss(y_pred = predictions, y_true = testingSet$result)
 logloss
 misclassification
 ```
-
