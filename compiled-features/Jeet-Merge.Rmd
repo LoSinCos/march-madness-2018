@@ -196,6 +196,30 @@ training <- merge(x = training, y = avgStats2, by = c("Season", "team2_id"), all
 rm(avgStats, avgStats1, avgStats2)
 ```
 
+Merge in Sum Stats
+```{r}
+sumStats <- read.csv("allteams-allseason-sum.csv")
+sumStats<-sumStats[,c(1:2,17,32:35)]
+
+head(sumStats)
+
+
+sumStats1 <- sumStats
+names(sumStats1)[2] <- "team1_id"
+names(sumStats1)[3:7] <- paste(sep = "_", "team1", names(sumStats1)[3:7])
+
+sumStats2 <- sumStats
+names(sumStats2)[2] <- "team2_id"
+names(sumStats2)[3:7] <- paste(sep = "_", "team2", names(sumStats2)[3:7])
+
+# Left outer joins to associate win/loss data
+training <- merge(x = training, y = sumStats1, by = c("Season", "team1_id"), all.x = TRUE)
+training <- merge(x = training, y = sumStats2, by = c("Season", "team2_id"), all.x = TRUE)
+rm(sumStats, sumStats1, sumStats2)
+
+```
+
+
 Merging in Standard Deviation of Stats
 ```{r}
 sdStats <- read.csv("allteams-allseason-SD.csv")
@@ -264,6 +288,26 @@ names(Stats2)<- c("Season", "team2_id",  "team2_avg_pospergame")
 training <- merge(x = training, y = Stats1, by = c("Season", "team1_id"), all.x = TRUE)
 training <- merge(x = training, y = Stats2, by = c("Season", "team2_id"), all.x = TRUE)
 rm(Stats, Stats1, Stats2)
+```
+
+
+```{r}
+training
+```
+
+Create EFGper, TSper, REBper column
+```{r}
+#Create EFGper column
+#Note: eFG % = [FGM + 0.5 * FGM3] / FGA
+training$team1_EFGper<-((training$team1_FGM+0.5*training$team1_FGM3)/(training$team1_FGA))
+training$team2_EFGper<-((training$team2_FGM+0.5*training$team2_FGM3)/(training$team2_FGA))
+
+#Create TSper column
+#Note: TSper = [ Score / [2*[FGA+[0.44*FTA]]]
+training$team1_TSper<-(training$team1_Score/(2*(training$team1_FGA+(0.44*training$team1_FTA))))
+training$team2_TSper<-(training$team2_Score/(2*(training$team2_FGA+(0.44*training$team2_FTA))))
+
+
 ```
 
 

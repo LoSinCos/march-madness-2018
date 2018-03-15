@@ -106,9 +106,21 @@ seasonResultsCompiledUnique <- seasonResultsCompiledUnique %>%
 ```
 
 ```{r}
+#calculate ORper
+seasonResultsCompiledUnique <- seasonResultsCompiledUnique %>% 
+  mutate(ORper = Sum_OR/(Opp_Sum_DR+Sum_OR))
+
+#calculate DRper
+seasonResultsCompiledUnique <- seasonResultsCompiledUnique %>% 
+  mutate(DRper = Sum_DR/(Opp_Sum_OR+Sum_DR))
+```
+
+
+```{r}
 #calculate net rating
 seasonResultsCompiledUnique <- seasonResultsCompiledUnique %>% 
   mutate(NetRtg = OffRtg - DefRtg)
+head(seasonResultsCompiledUnique)
 ```
 
 
