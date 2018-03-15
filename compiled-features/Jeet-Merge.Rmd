@@ -139,17 +139,25 @@ massey <- subset(massey, RankingDayNum == 133)
 
 rankings <- aggregate(massey[,5],list(massey$Season, massey$TeamID),mean)
 sd <- aggregate(massey[,5],list(massey$Season, massey$TeamID),sd)
+pom <- subset(massey, SystemName == "POM")
+pom$RankingDayNum = NULL
+pom$SystemName = NULL
+names(pom)[3] <- "pom"
 
 names(rankings) <- c("Season", "TeamID", "mean")
 rankings$sd <- sd$x
+
+rankings <- merge(x = rankings, y = pom, by = c("Season", "TeamID"), all.x = TRUE)
+# takes days without POM rankings and replaces with average ranking)
+rankings$pom <- ifelse(is.na(rankings$pom), rankings$mean, rankings$pom)
 rm(sd, massey)
 ```
 
 ```{r}
 rankings1 <- rankings
-names(rankings1) <- c("Season", "team1_id", "team1_avgranking", "team1_sdranking")
+names(rankings1) <- c("Season", "team1_id", "team1_avgranking", "team1_sdranking", "team1_pomranking")
 rankings2 <- rankings
-names(rankings2) <- c("Season", "team2_id", "team2_avg_ranking", "team2_sd_ranking")
+names(rankings2) <- c("Season", "team2_id", "team2_avg_ranking", "team2_sd_ranking", "team2_pomranking")
 
 # Left outer joins to associate ranking data
 training <- merge(x = training, y = rankings1, by = c("Season", "team1_id"), all.x = TRUE)
