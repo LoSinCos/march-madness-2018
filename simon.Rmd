@@ -14,11 +14,32 @@ library(magrittr)
 library(dplyr)
 
 # load data need data files Seeds, Results, Conferences, and Coaches
-seeds <- read.csv("../data/NCAATourneySeeds.csv")
-results <- read.csv("../data/RegularSeasonCompactResults.csv")
+seeds <- read.csv("data/NCAATourneySeeds.csv")
+WinLoss<-read.csv("data/allteams-allseason-allcoaches-winloss-1985-2017.csv")
+results <- read.csv("data/RegularSeasonCompactResults.csv")
 results<-subset(results,Season<year)
-testData<-read.csv("../data/SampleSubmissionStage1.csv")
+testData<-read.csv("data/SampleSubmissionStage1.csv")
 ```
+
+```{r}
+# seeds <- read.csv("./data/NCAATourneySeeds.csv")
+# seeds<-subset(seeds,Season<year)
+# results <- read.csv("./data/RegularSeasonCompactResults.csv")
+# results<-subset(results,Season<year)
+# 
+# for (i in 1:length(seeds$TeamID)){
+#   WinCount<-0
+#   for(j in 1:length(results$WTeamID)){
+#     if(results$WTeamID[j]==seeds$TeamID[i]&results$Season[j]==seeds$Season[i]){
+#       WinCount<-WinCount+1
+#     }
+#   }
+#   seeds$WinCount[i]<-WinCount
+# }
+# 
+# seeds
+```
+
 
 Strip seed text (!!!)
 ```{r}
@@ -62,14 +83,39 @@ head(resultsEX)
 
 # Create variable seed_diff
 resultsEX %<>% mutate(seed_diff = T1Seed - T2Seed)
+resultsEX
 ```
+
+Join Coach Win/Loss Data
+```{r}
+
+WinLoss
+
+
+T1WinLoss<-select(WinLoss,c(1:2,17:19))
+T2WinLoss<-select(WinLoss,c(1:2,17:19))
+
+colnames(T1WinLoss)<-paste("T1",colnames(T1WinLoss),sep="_")
+colnames(T2WinLoss)<-paste("T2",colnames(T2WinLoss),sep="_")
+
+resultsEX %<>% left_join(., T1WinLoss, by = c("Season"="T1_Season", "Team1"="T1_TeamID"))
+resultsEX %<>% left_join(., T2WinLoss, by = c("Season"="T2_Season", "Team2"="T2_TeamID"))
+
+resultsEX %<>% mutate(Coach_Windiff = T1_CoachWinPer - T2_CoachWinPer)
+resultsEX %<>% mutate(Coach_Expdiff = T1_CoachYears - T2_CoachYears)
+
+
+resultsEX
+
+```
+
 
 Strip Test data (!!!)
 ```{r}
 
 testDataEX<-testData
 testDataEX %<>% select(ID) %>% separate(ID, sep = "_", into = c("Season", "Team1", "Team2"), convert = TRUE)
-head(testDataEX)
+testDataEX
 
 team1_seeds2 <- seeds %>% set_colnames(c("Season", "T1Seed", "Team1ID"))
 team2_seeds2 <- seeds %>% set_colnames(c("Season", "T2Seed", "Team2ID"))
@@ -78,18 +124,24 @@ testDataEX %<>% left_join(., team1_seeds2, by = c("Season", "Team1"="Team1ID"))
 testDataEX %<>% left_join(., team2_seeds2, by = c("Season", "Team2"="Team2ID"))
 head(testDataEX)
 
+testDataEX %<>% left_join(., T1WinLoss, by = c("Season"="T1_Season", "Team1"="T1_TeamID"))
+testDataEX %<>% left_join(., T2WinLoss, by = c("Season"="T2_Season", "Team2"="T2_TeamID"))
+
+testDataEX %<>% mutate(Coach_Windiff = T1_CoachWinPer - T2_CoachWinPer)
+testDataEX %<>% mutate(Coach_Expdiff = T1_CoachYears - T2_CoachYears)
+
 testDataEX %<>% mutate(team1_seed_str = if_else(T1Seed < 9, 1,0),
                   team2_seed_str = if_else(T2Seed < 9, 1,0),
                   seed_diff = T1Seed - T2Seed)
 
                   
-head(testDataEX)
+testDataEX
 
 ```
 
 Fit logistic regression to results data
 ```{r}
-logitModel<-glm(result~seed_diff+team1_seed_str+team2_seed_str,data=resultsEX,family=binomial(link="logit"))
+logitModel<-glm(result~seed_diff+Coach_Windiff+Coach_Expdiff,data=resultsEX,family=binomial(link="logit"))
 summary(logitModel)
 ```
 
@@ -102,9 +154,47 @@ outputFrame$ID<-paste(testDataEX$Season,testDataEX$Team1,testDataEX$Team2,sep ="
 outputFrame$Pred<-NCAAPredictions
 head(outputFrame)
 
+```
+
+```{r}
 write.csv(outputFrame,"testOutput.csv")
 ```
 
+
+Coach Data
+```{r}
+
+library(dplyr)
+
+CoachData<-read.csv("data/TeamCoaches.csv")
+CoachData<-subset(CoachData,LastDayNum==154)
+#CoachData
+
+CoachData %<>%
+  group_by(CoachName) %>%
+  mutate(CoachYears = 1:n())
+CoachData
+
+
+WinLossData<-read.csv("data/allteams-allseason-winloss-1985-2017.csv")
+WinLossData
+
+WinLossData %<>% left_join(.,select(CoachData,-c(FirstDayNum,LastDayNum)), by = c("Season", "TeamID"))
+WinLossData
+
+WinLossData$SumofWinPer <- ave(WinLossData$WinPer,WinLossData$CoachName,FUN=cumsum)
+WinLossData
+
+WinLossData$CoachWinPer<-WinLossData$SumofWinPer/WinLossData$CoachYears
+WinLossData
+
+
+```
+
+Write Win/Loss Data with Coach Record into CSV
+```{r}
+write.csv(WinLossData, file = "allteams-allseason-allcoaches-winloss.csv", row.names = FALSE)
+```
 
 
 
