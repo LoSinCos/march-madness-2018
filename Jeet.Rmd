@@ -27,6 +27,12 @@ data$team1_WinPerNeut <- NULL
 data$team1_WinPerNotHome <- NULL
 data$team2_WinPerNeut <- NULL
 data$team2_WinPerNotHome <- NULL
+data$team1_avg_pospergame <- NULL
+data$team2_avg_pospergame <- NULL
+data$team1_avgscoremargin <- data$team1_Score - data$team1_avg_pts_against
+data$team2_avgscoremargin <- data$team2_Score - data$team2_avg_pts_against
+data$team1_avg_pospergame <- NULL
+data$team2_avg_pospergame <- NULL
 
 data <- data[data$Season >= 2003,]
 ```
@@ -66,7 +72,7 @@ for(i in 2:len){
   dataSet[,column] <- data[c1]/(data[c1]+data[c2]+0.000001)
 }
 
-dataSet <- dataSet[dataSet$post==1,]
+dataSet <- dataSet[dataSet$Season == 2018,]
 rm(x, x1, x2, c1, c2)
 ```
 

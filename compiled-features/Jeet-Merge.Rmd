@@ -7,7 +7,7 @@ output: html_notebook
 Set testing year
 ```{r}
 library(stringr)
-year<-2018
+year<-2019
 ```
 
 
@@ -94,7 +94,7 @@ summary(training)
 
 Load Coach names and format accordingly
 ```{r}
-coaches <- read.csv("allteams-allseason-allcoaches-winloss-1985-2017.csv")
+coaches <- read.csv("allteams-allseason-allcoaches-winloss.csv")
 coaches <- coaches[c("Season", "TeamID", "CoachYears", "CoachWinPer")]
 coaches1 <- coaches
 names(coaches1) <- c("Season", "team1_id", "team1_CoachYears", "team1_CoachWinPer")
@@ -318,6 +318,10 @@ training$team2_TSper<-(training$team2_Score/(2*(training$team2_FGA+(0.44*trainin
 
 ```
 
+
+```{r}
+fuck <- subset(training, Season == 2018)
+```
 
 Write to CSV
 ```{r}
